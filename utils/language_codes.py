@@ -7,7 +7,7 @@ LANGUAGE_MAP = {
     },
     "es": {
         "name": "Spanish",
-        "spacy": "es_core_news_md",
+        "spacy": "es_core_news_sm",
         "spellchecker": "es",
         "language_tool": "es-ES",
     },
