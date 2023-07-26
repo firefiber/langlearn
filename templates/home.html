@@ -2,7 +2,7 @@
 {% extends 'main/base.html' %}
 
     {% block head_scripts %}
-        <script src="{% static 'js/submit.js' %}" defer></script>
+        <script src="{% static 'main/js/submit.js' %}" defer></script>
         <script>
             const csrftoken = '{{ csrf_token }}';
         </script>
