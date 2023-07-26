@@ -1,36 +1,68 @@
-<!-- LangLearn/templates/home.html -->
-{% extends 'main/base.html' %}
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% block head_scripts %} {% endblock %}
+    {% if title %}
+        <title>{{ title }}</title>
+    {%  endif %}
 
-    {% block head_scripts %}
-        <script src="{% static 'main/../static/js/submit.js' %}" defer></script>
-        <script>
-            const csrftoken = '{{ csrf_token }}';
-        </script>
-        <script>
-            window.onload = function() {
-                originalSentence = "{{ sentence.sentence }}";
-            };
-        </script>
-    {% endblock %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a class="learning" href="/learning">Learning</a></li>
+                <li><a class="home" href="/">home</a></li>
 
-    {% block content %}
-        <h1>Welcome, {{ username }}!</h1>
-        <p>You are learning {{ learning_language }}.</p>
-        <p>Your proficiency level is {{ proficiency }}.</p>
-        <p id="sentence">{{ sentence.sentence }}</p>
-        <p id="translation">{{ sentence.translation }}</p>
+            </ul>
+        </nav>
+    </header>
+    <h1>From base</h1>
+    <div class="container">
+    {% block content %} {% endblock %}
+    </div>
+</body>
+</html>
+
+{#<!-- LangLearn/templates/base.html -->#}
+{#{% extends 'main/base.html' %}#}
+{##}
+{#    {% block head_scripts %}#}
+{#        <script src="{% static 'main/../static/js/submit.js' %}" defer></script>#}
+{#        <script>#}
+{#            const csrftoken = '{{ csrf_token }}';#}
+{#        </script>#}
+{#        <script>#}
+{#            window.onload = function() {#}
+{#                originalSentence = "{{ sentence.sentence }}";#}
+{#            };#}
+{#        </script>#}
+{#    {% endblock %}#}
+{##}
+{#    {% block content %}#}
+{#        <h1>Welcome, {{ username }}!</h1>#}
+{#        <p>You are learning {{ learning_language }}.</p>#}
+{#        <p>Your proficiency level is {{ proficiency }}.</p>#}
+{#        <p id="sentence">{{ sentence.sentence }}</p>#}
+{#        <p id="translation">{{ sentence.translation }}</p>#}
+{##}
+{##}
+{#        <textarea id="user-input"></textarea>#}
+{#        <button id="submit-button">Submit</button>#}
+{#        <p id="error-text"></p>#}
+{##}
+{#        <div id="compare-results"></div>#}
+{#    {% endblock %}#}
 
 
-        <textarea id="user-input"></textarea>
-        <button id="submit-button">Submit</button>
-        <p id="error-text"></p>
 
-        <div id="compare-results"></div>
-    {% endblock %}
-
-
-
-<!-- LangLearn/templates/home.html -->
+<!-- LangLearn/templates/base.html -->
 {##}
 {#<!DOCTYPE html>#}
 {#<html>#}
