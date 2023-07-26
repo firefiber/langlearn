@@ -6,7 +6,7 @@ openai==0.27.6
 pandas==2.0.1
 pyspellchecker==0.7.2
 python-dotenv==1.0.0
-spacy==3.5.3
+spacy==3.6.0
 textdistance==4.5.0
 gunicorn==20.1.0
 psycopg2==2.9.6
