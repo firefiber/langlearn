@@ -6,7 +6,8 @@ from scoring.services import SentenceComparer, ScoreManager
 import json
 
 
-def home(request):
+def learning(request):
+
     username = 'adrian'
     user_info = global_round_manager.user_info
 
