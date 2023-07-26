@@ -19,7 +19,7 @@ def home(request):
         'sentence': global_round_manager.get_sentence(),
     }
 
-    return render(request, 'home.html', context)
+    return render(request, 'main/home.html', context)
 
 
 def next_sentence(request):

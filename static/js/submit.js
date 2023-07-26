@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const htmlDocument = parser.parseFromString(data, "text/html");
                     const newSentence = htmlDocument.getElementById('sentence').textContent;
                     const newTranslation = htmlDocument.getElementById('translation').textContent;  // get the new translation
+
+                    originalSentence = newSentence;  // update the original sentence
+
                     document.getElementById('sentence').textContent = newSentence;
                     document.getElementById('translation').textContent = newTranslation;  // update the translation
 
@@ -40,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         // If the button says 'Submit', send a POST request to the compare endpoint
-        fetch('/compare/', {
+        fetch('compare/', {
             method: 'POST',
             body: JSON.stringify({
                 user_sentence: userInput.value,
