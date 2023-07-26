@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (submitButton.textContent === 'Next') {
             // Fetch new sentence and update originalSentence
-            fetch('/next_sentence/')
+            fetch('next_sentence/')
                 .then(response => response.text())
                 .then(data => {
                     const parser = new DOMParser();

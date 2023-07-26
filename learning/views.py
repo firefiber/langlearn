@@ -36,7 +36,7 @@ def next_sentence(request):
         'sentence': next_sentence,
     }
 
-    return render(request, 'home.html', context)
+    return render(request, 'main/home.html', context)
 
 
 @csrf_exempt
