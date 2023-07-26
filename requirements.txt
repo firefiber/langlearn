@@ -11,3 +11,4 @@ textdistance==4.5.0
 gunicorn==20.1.0
 psycopg2==2.9.6
 crispy-bootstrap5==0.7
+whitenoise==6.5.0
