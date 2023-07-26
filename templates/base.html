@@ -14,18 +14,25 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a class="learning" href="/learning">Learning</a></li>
-                <li><a class="home" href="/">home</a></li>
+   <div class="grid-container">
+        <header class="header">
+            <div>Langlearn - Alpha</div>
+            <div>
+                <button>Sign Up</button>
+                <button>Sign In</button>
+            </div>
+        </header>
 
-            </ul>
-        </nav>
-    </header>
-    <h1>From base</h1>
-    <div class="container">
-    {% block content %} {% endblock %}
+        <main class="content">
+            <div class="container">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Footer content goes here</p>
+        </footer>
     </div>
 </body>
 </html>

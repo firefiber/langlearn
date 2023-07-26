@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'user_management.apps.UserManagementConfig',
     # THIRD PARTY APPS
     'crispy_forms',
-    'crispy_bootstrap5'
+    'crispy_bootstrap5',
+    'livereload',
 
 ]
 
