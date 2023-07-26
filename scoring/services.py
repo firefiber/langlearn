@@ -12,7 +12,7 @@ class SentenceComparer:
 
         self.nlp = self.language_manager.nlp
         self.spell = self.language_manager.spell
-        self.tool = self.language_manager.tool
+        # self.tool = self.language_manager.tool
 
     def compare_sentences(self, correct_sentence, user_sentence):
         # Tokenize sentences

@@ -1,6 +1,5 @@
 Django==4.2.1
 fuzzywuzzy==0.18.0
-language_tool_python==2.7.1
 numpy==1.24.3
 openai==0.27.6
 pandas==2.0.1
