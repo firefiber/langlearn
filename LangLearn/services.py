@@ -63,4 +63,4 @@ class RoundManager:
         if self.buffer_loader.is_alive():
             self.buffer_loader.join()
 
-global_round_manager = RoundManager("adrian")
+# global_round_manager = RoundManager("adrian")

@@ -5,7 +5,7 @@ from languages.models import Language, Word, Sentence
 '''
 This model records which words a user is learning, their current proficiency level with each word, and the last 
 time they practiced that word. This is a many-to-many relationship between User and Word, as each user can learn many 
-words and each word can be learned by many users. 
+words and each word can be learned by many user_management. 
 '''
 
 
@@ -25,7 +25,7 @@ class UserWord(models.Model):
 '''
 This model records which sentences a user is learning, their current proficiency level with each sentence, 
 and the last time they practiced that sentence. This is a many-to-many relationship between User and Sentence, 
-as each user can learn many sentences and each sentence can be learned by many users. 
+as each user can learn many sentences and each sentence can be learned by many user_management. 
 '''
 
 

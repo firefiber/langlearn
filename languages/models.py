@@ -3,7 +3,7 @@ from django.db import models
 
 '''
 This model contains data related to the languages that the app supports. Each language has a name. 
-This model is referenced by other models to link users, words, and sentences to a specific language. 
+This model is referenced by other models to link user_management, words, and sentences to a specific language. 
 '''
 
 
@@ -15,7 +15,7 @@ class Language(models.Model):
 
 
 '''
-This model contains the data about each word that users can learn. Each word is associated with a language and has 
+This model contains the data about each word that user_management can learn. Each word is associated with a language and has 
 a frequency_rating which indicates how common the word is. 
 '''
 
@@ -47,7 +47,7 @@ class SentenceType(models.Model):
 
 
 '''
-This model stores the sentences that users can practice translating. Each sentence is linked to a 
+This model stores the sentences that user_management can practice translating. Each sentence is linked to a 
 language and has a complexity_rating.
 '''
 

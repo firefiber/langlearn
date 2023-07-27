@@ -1,7 +1,7 @@
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
-from LangLearn.services import global_round_manager
+# from LangLearn.services import global_round_manager
 from scoring.services import SentenceComparer, ScoreManager
 import json
 

@@ -4,7 +4,7 @@ from user_management.models import UserProfile
 '''
 This model records the score that each user has achieved for each word they've learned on each day. This is a 
 many-to-many relationship between User and Word, as each user can have many word scores and each word can have many 
-scores associated with different users. 
+scores associated with different user_management. 
 '''
 
 

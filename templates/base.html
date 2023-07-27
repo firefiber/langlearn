@@ -18,8 +18,9 @@
         <header class="header">
             <div>Langlearn - Alpha</div>
             <div>
-                <button>Sign Up</button>
-                <button>Sign In</button>
+                <form action="{% url 'register' %}" method="get">
+                    <button id="signup">Sign Up</button>
+                </form>
             </div>
         </header>
 

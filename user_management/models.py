@@ -24,7 +24,7 @@ class UserProfile(models.Model):
 
 
 '''
-This model represents the language proficiencies of users. It establishes a many-to-many relationship 
+This model represents the language proficiencies of user_management. It establishes a many-to-many relationship 
 between UserProfile and Language through UserLanguageProficiency.
 Each UserLanguageProficiency instance links a user profile, a language, and a proficiency level.
 '''
