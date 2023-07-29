@@ -1,33 +1,13 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
 {% block content %}
-    <div class="content">
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="{{ user_form.username.id_for_label }}">Username:</label>
-                <input type="text" name="{{ user_form.username.name }}" id="{{ user_form.username.id_for_label }}" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="{{ user_form.email.id_for_label }}">Email:</label>
-                <input type="email" name="{{ user_form.email.name }}" id="{{ user_form.email.id_for_label }}" class="form-control">
-            <div class="form-group">
-                <label for="{{ user_form.password1.id_for_label }}">Password:</label>
-                <input type="password" name="{{ user_form.password1.name }}" id="{{ user_form.password1.id_for_label }}" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="{{ user_form.password2.id_for_label }}">Password confirmation:</label>
-                <input type="password" name="{{ user_form.password2.name }}" id="{{ user_form.password2.id_for_label }}" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="{{ profile_form.native_language.id_for_label }}">Native Language:</label>
-                {{ profile_form.native_language }}
-            </div>
-            <div class="form-group">
-                <label for="{{ profile_form.learning_languages.id_for_label }}">Learning Language:</label>
-                {{ profile_form.learning_languages }}
-            <button type="submit" class="btn btn-primary">Sign Up</button>
-        </form>
-        <small>Already have an account? <a href="{% url 'login' %}">Login</a></small>
-    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+    </form>
+    <small>Already have an account? <a href="{% url 'login' %}">Login</a></small>
 {% endblock %}
 ```
