@@ -1,26 +1,30 @@
-from django.http import JsonResponse, HttpResponseNotAllowed
+from django.http import JsonResponse, HttpResponseNotAllowed, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 # from LangLearn.services import global_round_manager
 from scoring.services import SentenceComparer, ScoreManager
 import json
 
-
+@login_required(login_url='/login/')
 def learning(request):
 
-    username = 'adrian'
-    user_info = global_round_manager.user_info
-
-    # Pass the first sentence to the template
-    context = {
-        'username': username,
-        'learning_language': user_info['learning_language'],
-        'native_language': user_info['native_language'],
-        'proficiency': user_info['proficiency'],
-        'sentence': global_round_manager.get_sentence(),
-    }
-
-    return render(request, 'main/home.html', context)
+    # username = 'adrian'
+    # user_info = global_round_manager.user_info
+    #
+    # # Pass the first sentence to the template
+    # context = {
+    #     'username': username,
+    #     'learning_language': user_info['learning_language'],
+    #     'native_language': user_info['native_language'],
+    #     'proficiency': user_info['proficiency'],
+    #     'sentence': global_round_manager.get_sentence(),
+    # }
+    #
+    # return render(request, 'main/home.html', context)
+    print(dir(request))
+    username = request.user.username
+    return HttpResponse(username)
 
 
 def next_sentence(request):
