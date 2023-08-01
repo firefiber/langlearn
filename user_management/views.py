@@ -1,5 +1,8 @@
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
 from django.views.generic.edit import FormView
+
 from .forms import NewUserForm
 
 # def register(request):
@@ -27,3 +30,6 @@ class RegisterView(FormView):
         form.save()
         return super().form_valid(form)
 
+    @method_decorator(never_cache)
+    def dispatch(self, *args, **kwargs):
+        return super(RegisterView, self).dispatch(*args, **kwargs)

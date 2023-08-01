@@ -7,6 +7,7 @@ from scoring.services import SentenceComparer, ScoreManager
 import json
 
 @login_required(login_url='/login/')
+@csrf_exempt
 def learning(request):
 
     username = request.user.username
