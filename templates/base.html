@@ -22,10 +22,17 @@
                 <div class="container-fluid">
                     <a class="navbar-brand" href="#">Langlearn - Alpha</a>
                     <div class="d-flex">
-                        <form action="" method="get">
-                            <button type='submit' class='btn btn-primary me-2' formaction="{% url 'register' %}">Sign Up</button>
-                            <button type='submit' class='btn btn-outline-primary' formaction="{% url 'login' %}">Sign In</button>
-                        </form>
+                        {% if user.is_authenticated %}
+                            <form action="{% url 'logout' %}" method="post">
+                                {% csrf_token %}
+                                <button type='submit' class='btn btn-outline-primary'>Logout</button>
+                            </form>
+                        {% else %}
+                            <form action="" method="get">
+                                <button type='submit' class='btn btn-primary me-2' formaction="{% url 'register' %}">Sign Up</button>
+                                <button type='submit' class='btn btn-outline-primary' formaction="{% url 'login' %}">Sign In</button>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             </nav>
@@ -45,6 +52,56 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 </body>
 </html>
+
+
+
+{#{% load static %}#}
+{#<!doctype html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <meta name="viewport"#}
+{#          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">#}
+{#    <meta http-equiv="X-UA-Compatible" content="ie=edge">#}
+{#    {% block head_scripts %} {% endblock %}#}
+{#    {% if title %}#}
+{#        <title>{{ title }}</title>#}
+{#    {%  endif %}#}
+{##}
+{#    <link rel="stylesheet" href="{% static 'css/base.css' %}">#}
+{#    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">#}
+{##}
+{#</head>#}
+{#<body>#}
+{#   <div class="grid-container">#}
+{#        <header>#}
+{#            <nav class="navbar navbar-expand-lg navbar-light bg-light">#}
+{#                <div class="container-fluid">#}
+{#                    <a class="navbar-brand" href="#">Langlearn - Alpha</a>#}
+{#                    <div class="d-flex">#}
+{#                        <form action="" method="get">#}
+{#                            <button type='submit' class='btn btn-primary me-2' formaction="{% url 'register' %}">Sign Up</button>#}
+{#                            <button type='submit' class='btn btn-outline-primary' formaction="{% url 'login' %}">Sign In</button>#}
+{#                        </form>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </nav>#}
+{#        </header>#}
+{##}
+{#        <main class="content">#}
+{#            <div class="container">#}
+{#                {% block content %}#}
+{#                {% endblock %}#}
+{#            </div>#}
+{#        </main>#}
+{##}
+{#        <footer class="footer">#}
+{#            <p>Footer content goes here</p>#}
+{#        </footer>#}
+{#    </div>#}
+{#<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>#}
+{#</body>#}
+{#</html>#}
 
 {#<!-- LangLearn/templates/base.html -->#}
 {#{% extends 'main/base.html' %}#}
