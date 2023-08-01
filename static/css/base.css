@@ -14,7 +14,7 @@ body, html {
     height: 100%;
 }
 
-.header {
+.header .nav {
     grid-area: header;
     display: flex;
     justify-content: space-between;
@@ -40,4 +40,8 @@ body, html {
     background: #f8f9fa;
     padding: 10px;
     text-align: center;
+}
+
+#signup, #signin{
+    display: inline-block;
 }

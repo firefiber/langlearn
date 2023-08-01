@@ -17,13 +17,18 @@
 </head>
 <body>
    <div class="grid-container">
-        <header class="header">
-            <div>Langlearn - Alpha</div>
-            <div>
-                <form action="{% url 'register' %}" method="get">
-                    <button id="signup">Sign Up</button>
-                </form>
-            </div>
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">Langlearn - Alpha</a>
+                    <div class="d-flex">
+                        <form action="" method="get">
+                            <button type='submit' class='btn btn-primary me-2' formaction="{% url 'register' %}">Sign Up</button>
+                            <button type='submit' class='btn btn-outline-primary' formaction="{% url 'login' %}">Sign In</button>
+                        </form>
+                    </div>
+                </div>
+            </nav>
         </header>
 
         <main class="content">

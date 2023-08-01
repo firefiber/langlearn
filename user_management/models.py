@@ -51,7 +51,7 @@ class UserLanguageProficiency(models.Model):
     buffer_location = models.FloatField(default=0.0)
 
     buffer_range_start = models.IntegerField(default=0)
-    buffer_range_end = models.IntegerField(default=0)
+    buffer_range_end = models.IntegerField(default=500)
 
     class Meta:
         unique_together = ('user_profile', 'language')

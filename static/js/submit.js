@@ -58,13 +58,13 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 // Display the results in a user-friendly way
                 resultsDiv.innerHTML = `
-                    <h2>Results</h2>
-                    <p>Overall similarity score: ${data.similarity}</p>
-                    <p>Your sentence: ${userInput.textContent}</p>
+                    <h2 class="mt-3">Results</h2>
+                    <p class="mb-1">Overall similarity score: ${data.similarity}</p>
+                    <p class="mb-1">Your sentence: ${userInput.textContent}</p>
                 `;
 
                 data.word_scores.forEach(([word, score]) => {
-                    resultsDiv.innerHTML += `<p>${word}: ${score}</p>`;
+                    resultsDiv.innerHTML += `<p class="mb-1">${word}: ${score}</p>`;
                 });
 
                 // Change the button text to 'Next'

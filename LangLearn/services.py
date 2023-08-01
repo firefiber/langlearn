@@ -5,20 +5,18 @@ from learning.services.generate_sentences import from_openai_chat
 import time
 
 class RoundManager:
-    def __init__(self, username):
+    def __init__(self):
+        self.user_info = None
+        self.user_practice_buffer = None
+        self.buffer = Queue()
+        self.history = []
+        self.session_active = False
+        self.buffer_loader = threading.Thread(target=self.load_additional_sentences, daemon=True)
+
+    def set_user(self, username):
         # Load user information
         self.user_info = fetch_user_info(username)
         self.user_practice_buffer = get_practice_buffer(username)
-
-        # Initialize buffer and history
-        self.buffer = Queue()
-        self.history = []
-
-        # Flag to indicate the session status
-        self.session_active = False
-
-        # Initialize buffer loader thread
-        self.buffer_loader = threading.Thread(target=self.load_additional_sentences, daemon=True)
 
         # Start the session
         self.start_session()
@@ -63,4 +61,4 @@ class RoundManager:
         if self.buffer_loader.is_alive():
             self.buffer_loader.join()
 
-# global_round_manager = RoundManager("adrian")
+global_round_manager = RoundManager()

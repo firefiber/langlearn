@@ -1,28 +1,37 @@
+
 {% extends 'base.html' %}
 {% load static %}
-    {% block head_scripts %}
-        <script src="{% static 'js/submit.js' %}" defer></script>
-        <script>
-            const csrftoken = '{{ csrf_token }}';
-        </script>
-        <script>
-            window.onload = function() {
-                originalSentence = "{{ sentence.sentence }}";
-            };
-        </script>
-    {% endblock %}
 
-    {% block content %}
-        <h1>Welcome, {{ username }}!</h1>
+{% block head_scripts %}
+    <script src="{% static 'js/submit.js' %}" defer></script>
+    <script>
+        const csrftoken = '{{ csrf_token }}';
+    </script>
+    <script>
+        window.onload = function() {
+            originalSentence = "{{ sentence.sentence }}";
+        };
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="mb-4">Welcome, {{ username }}!</h1>
         <p>You are learning {{ learning_language }}.</p>
-        <p>Your proficiency level is {{ proficiency }}.</p>
-        <p id="sentence">{{ sentence.sentence }}</p>
-        <p id="translation">{{ sentence.translation }}</p>
-
-
-        <textarea id="user-input"></textarea>
-        <button id="submit-button">Submit</button>
-        <p id="error-text"></p>
-
-        <div id="compare-results"></div>
-    {% endblock %}
+        <div class="mb-3">
+            <label for="translation" class="form-label">Sentence:</label>
+            <p id="translation" class="form-control">{{ sentence.translation }}</p>
+        </div>
+        <div class="mb-3">
+            <label for="sentence" class="form-label">Answer:</label>
+            <p id="sentence" class="form-control">{{ sentence.sentence }}</p>
+        </div>
+        <div class="mb-3">
+            <label for="user-input" class="form-label">Your Translation</label>
+            <textarea class="form-control" id="user-input"></textarea>
+        </div>
+        <button class="btn btn-primary" id="submit-button">Submit</button>
+        <p id="error-text" class="text-danger"></p>
+        <div id="compare-results" class="mt-4"></div>
+    </div>
+{% endblock %}

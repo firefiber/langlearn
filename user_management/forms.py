@@ -22,12 +22,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from user_management.models import UserProfile, Language
 from django.db import transaction
-
+from django.core.exceptions import ObjectDoesNotExist
 
 class NewUserForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    native_language = forms.ModelChoiceField(queryset=Language.objects.all(), required=True)
-    learning_language = forms.ModelChoiceField(queryset=Language.objects.all(), required=True)
 
     class Meta(UserCreationForm.Meta):
         model = User
@@ -39,12 +37,20 @@ class NewUserForm(UserCreationForm):
         user.email = self.cleaned_data.get('email')
         user.save()
 
+        try:
+            native_language = Language.objects.get(name='English')
+            learning_language = Language.objects.get(name='Spanish')
+        except ObjectDoesNotExist:
+            # Handle the error if the language does not exist
+            return user
+
         user_profile = UserProfile.objects.create(user=user,
-                                                  native_language=self.cleaned_data.get('native_language'))
+                                                  native_language=native_language)
 
         user_profile.learning_languages.add(
-            self.cleaned_data.get('learning_language'), through_defaults={'is_active': True}
+            learning_language, through_defaults={'is_active': True}
         )
 
         return user
+
 
