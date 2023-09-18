@@ -4,6 +4,7 @@ from django.utils import timezone
 from learning.models import Word, UserWord, Sentence, UserSentence, UserPracticeBuffer
 from scoring.models import WordScore
 from fuzzywuzzy import fuzz
+from unidecode import unidecode
 
 class SentenceComparer:
     def __init__(self, language_code):
@@ -14,27 +15,52 @@ class SentenceComparer:
         self.spell = self.language_manager.spell
         # self.tool = self.language_manager.tool
 
+    def normalize_sentence(self,s):
+        return unidecode(s)
+
     def compare_sentences(self, correct_sentence, user_sentence):
         # Tokenize sentences
-        correct_tokens = correct_sentence.split()
-        user_tokens = user_sentence.split()
-
+        
+        correct_tokens = set(self.normalize_sentence(correct_sentence).split())
+        user_tokens = set(self.normalize_sentence(user_sentence).split())
+        common_tokens = correct_tokens.intersection(user_tokens)
+        print(common_tokens)
         word_scores = []
-        for i, correct_word in enumerate(correct_tokens):
-            if i < len(user_tokens):
-                user_word = user_tokens[i]
-                score = fuzz.ratio(correct_word, user_word) / 100
-            else:
-                score = 0
-            word_scores.append((correct_word, score))
 
-        # Calculate overall similarity as the average of word scores
-        similarity = sum(score for _, score in word_scores) / len(word_scores) if word_scores else 0
+        for word in common_tokens:
+            word_scores.append((word, 1))
+
+        # Calculate similarity ratio (number of common words divided by total number of user words)
+        if len(user_tokens) == 0:
+            similarity = 0
+        else:
+            similarity = len(common_tokens) / len(correct_tokens)
 
         return {
             "similarity": similarity,
-            "word_scores": word_scores,
+            "word_scores": word_scores
         }
+    # def compare_sentences(self, correct_sentence, user_sentence):
+    #     # Tokenize sentences
+    #     correct_tokens = correct_sentence.split()
+    #     user_tokens = user_sentence.split()
+    #
+    #     word_scores = []
+    #     for i, correct_word in enumerate(correct_tokens):
+    #         if i < len(user_tokens):
+    #             user_word = user_tokens[i]
+    #             score = fuzz.ratio(correct_word, user_word) / 100
+    #         else:
+    #             score = 0
+    #         word_scores.append((correct_word, score))
+    #
+    #     # Calculate overall similarity as the average of word scores
+    #     similarity = sum(score for _, score in word_scores) / len(word_scores) if word_scores else 0
+    #
+    #     return {
+    #         "similarity": similarity,
+    #         "word_scores": word_scores,
+    #     }
 
 
 class ScoreManager:
