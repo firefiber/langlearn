@@ -3,7 +3,7 @@ from utils.languge_code_manager import LanguageCodeManager
 from django.utils import timezone
 from learning.models import Word, UserWord, Sentence, UserSentence, UserPracticeBuffer
 from scoring.models import WordScore
-from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 from unidecode import unidecode
 
 class SentenceComparer:
@@ -18,12 +18,22 @@ class SentenceComparer:
     def normalize_sentence(self,s):
         return unidecode(s)
 
+    def get_best_match(self, word, correct_tokens):
+        best_match, score = process.extractOne(word, correct_tokens)
+        if score > 90:
+            return best_match
+        return word
+
     def compare_sentences(self, correct_sentence, user_sentence):
         # Tokenize sentences
         
         correct_tokens = set(self.normalize_sentence(correct_sentence).split())
         user_tokens = set(self.normalize_sentence(user_sentence).split())
-        common_tokens = correct_tokens.intersection(user_tokens)
+
+        user_tokens_corrected = set([self.get_best_match(word, correct_tokens) for word in user_tokens])
+
+        common_tokens = correct_tokens.intersection(user_tokens_corrected)
+
         print(common_tokens)
         word_scores = []
 
@@ -40,28 +50,6 @@ class SentenceComparer:
             "similarity": similarity,
             "word_scores": word_scores
         }
-    # def compare_sentences(self, correct_sentence, user_sentence):
-    #     # Tokenize sentences
-    #     correct_tokens = correct_sentence.split()
-    #     user_tokens = user_sentence.split()
-    #
-    #     word_scores = []
-    #     for i, correct_word in enumerate(correct_tokens):
-    #         if i < len(user_tokens):
-    #             user_word = user_tokens[i]
-    #             score = fuzz.ratio(correct_word, user_word) / 100
-    #         else:
-    #             score = 0
-    #         word_scores.append((correct_word, score))
-    #
-    #     # Calculate overall similarity as the average of word scores
-    #     similarity = sum(score for _, score in word_scores) / len(word_scores) if word_scores else 0
-    #
-    #     return {
-    #         "similarity": similarity,
-    #         "word_scores": word_scores,
-    #     }
-
 
 class ScoreManager:
     def __init__(self, user_profile):

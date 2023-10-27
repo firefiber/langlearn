@@ -1,6 +1,7 @@
 from queue import Queue
 from user_management.user_buffer import fetch_user_info, get_practice_buffer
 from learning.services.generate_sentences import from_openai_chat
+from languages.services import store_sentence
 
 class RoundManager:
     def __init__(self):
@@ -26,7 +27,9 @@ class RoundManager:
         )
         for sentence in generated_sentences:
             self.buffer.put(sentence)
-            print(sentence)
+            stored_sentence, message = store_sentence(sentence["sentence"], self.user_info['learning_language'])
+            print(f"Stored Sentence: {stored_sentence}, Message: {message}")
+            break
 
     def get_sentence(self):
         # If the buffer has less than 5 items, generate and add more sentences to the buffer

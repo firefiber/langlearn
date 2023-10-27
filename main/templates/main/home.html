@@ -22,10 +22,14 @@
             <label for="translation" class="form-label">Sentence:</label>
             <p id="translation" class="form-control">{{ sentence.translation }}</p>
         </div>
+
+        <!-- TODO: REMOVE THIS FOR PROD!  -->
+
         <div class="mb-3">
             <label for="sentence" class="form-label">Answer:</label>
             <p id="sentence" class="form-control">{{ sentence.sentence }}</p>
         </div>
+
         <div class="mb-3">
             <label for="user-input" class="form-label">Your Translation</label>
             <textarea class="form-control" id="user-input"></textarea>

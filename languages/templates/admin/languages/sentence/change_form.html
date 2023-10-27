@@ -1,0 +1,14 @@
+{% extends "admin/change_form.html" %}
+{% block field_sets %}
+    {{ block.super }}
+    {% if original and translations %}
+        <fieldset>
+            <h2>Existing Translations</h2>
+            <ul>
+                {% for translation in translations %}
+                    <li>{{ translation.sentence }} ({{ translation.language }})</li>
+                {% endfor %}
+            </ul>
+        </fieldset>
+    {% endif %}
+{% endblock %}

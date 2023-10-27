@@ -1,3 +1,4 @@
+import hashlib
 from statistics import mean
 from django.db import models
 
@@ -47,7 +48,7 @@ class SentenceType(models.Model):
 
 
 '''
-This model stores the sentences that user_management can practice translating. Each sentence is linked to a 
+This model stores the sentences that users can practice translating. Each sentence is linked to a 
 language and has a complexity_rating.
 '''
 
@@ -55,11 +56,16 @@ language and has a complexity_rating.
 class Sentence(models.Model):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
     sentence = models.TextField()
-    translation = models.TextField(null=True, blank=True)
-    complexity_rating = models.FloatField()
-    theme = models.CharField(max_length=100, default="general")
-    type = models.ManyToManyField(SentenceType)
-    words = models.ManyToManyField(Word)
+    sentence_hash = models.CharField(max_length=64, unique=True)
+    translation = models.ManyToManyField("self", symmetrical=False, related_name='translated_sentences', blank=True)
+    complexity_rating = models.FloatField(blank=True, null=True)
+    theme = models.CharField(max_length=100, default="general", blank=True)
+    type = models.ManyToManyField(SentenceType, blank=True)
+    words = models.ManyToManyField(Word, blank=True)
+
+    def get_translations(self):
+        # Fetch translations using the many-to-many relationship
+        return self.translated_sentences.all()
 
     def calculate_complexity(self):
         # Complexity based on length of the sentence
@@ -95,11 +101,27 @@ class Sentence(models.Model):
         return avg_word_complexity
 
     def save(self, *args, **kwargs):
-        self.calculate_complexity()
+        # self.calculate_complexity()
+        self.sentence_hash = hashlib.sha256(self.sentence.encode()).hexdigest()
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.sentence[:50]
+
+'''
+Intermediary model, used for storing translations into the database. 
+'''
+class Translation(models.Model):
+    source_sentence = models.ForeignKey(Sentence, related_name="translations_from", on_delete=models.CASCADE)
+    translated_sentence = models.ForeignKey(Sentence, related_name="translations_to", on_delete=models.CASCADE)
+    source_language = models.ForeignKey(Language, related_name="translation_sources", on_delete=models.SET_NULL, null=True)
+    translated_language = models.ForeignKey(Language, related_name="translated_languages", on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        unique_together = ['source_sentence', 'translated_sentence']
+
+    def __str__(self):
+        return f"{self.source_sentence.sentence[:30]} -> {self.translated_sentence.sentence[:30]}"
 
 
 '''
