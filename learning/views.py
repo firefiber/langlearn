@@ -9,6 +9,7 @@ import json
 @login_required(login_url='/login/')
 @csrf_exempt
 def learning(request):
+
     from django.conf import settings
     print(settings.SETTINGS_MODULE)
     username = request.user.username
