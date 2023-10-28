@@ -1,3 +1,8 @@
+#TODO: Check sentence buffer - seems issue with saving or retrieving.
+#TODO: Make sure "next" advances to next sentence in buffer
+#TODO: Only generate new sentences if less than 5 in buffer
+
+
 from queue import Queue
 from user_management.user_buffer import fetch_user_info, get_practice_buffer
 from learning.services.generate_sentences import from_openai_chat
@@ -25,11 +30,11 @@ class RoundManager:
             self.user_info['proficiency'],
             self.user_practice_buffer
         )
+
         for sentence in generated_sentences:
             self.buffer.put(sentence)
             stored_sentence, message = store_sentence(sentence["sentence"], self.user_info['learning_language'])
             print(f"Stored Sentence: {stored_sentence}, Message: {message}")
-            break
 
     def get_sentence(self):
         # If the buffer has less than 5 items, generate and add more sentences to the buffer
