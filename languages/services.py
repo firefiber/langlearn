@@ -5,6 +5,7 @@ from .models import Language, Sentence
 from django.db import transaction
 
 def store_sentence_translation_pair(pair):
+    #Stores sentence pairs, then links them together
     original_sentence, original_message = store_sentence(pair["sentence"], pair["sentence_language"])
     if original_sentence is None:
         return None, original_message
