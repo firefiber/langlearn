@@ -41,11 +41,11 @@ def from_openai_chat(learning_language, native_language, proficiency, words, the
 
     # Extract the output
     output = response['choices'][0]['message']['content']
-    cleaned_output = clean_openai_output(output)
+    cleaned_output = clean_openai_output(output, learning_language, native_language)
     return cleaned_output
 
 
-def clean_openai_output(output):
+def clean_openai_output(output, learning_language, native_language):
     lines = output.split('\n')  # split the output into lines
     cleaned_output = []
     for line in lines:
@@ -56,7 +56,9 @@ def clean_openai_output(output):
             cleaned_output.append({
                 "word": word.strip(),
                 "sentence": sentence.strip(),
-                "translation": translation.strip()
+                "translation": translation.strip(),
+                "sentence_language": learning_language,
+                "translation_language": native_language
             })
     return cleaned_output
 

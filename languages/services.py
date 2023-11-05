@@ -4,6 +4,21 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import Language, Sentence
 from django.db import transaction
 
+def store_sentence_translation_pair(pair):
+    original_sentence, original_message = store_sentence(pair["sentence"], pair["sentence_language"])
+    if original_sentence is None:
+        return None, original_message
+
+    translation_sentence, translation_message = store_sentence(pair["translation"], pair["translation_language"])
+    if translation_sentence is None:
+        return None, translation_message
+
+    with transaction.atomic():
+        original_sentence.translation.add(translation_sentence)
+        translation_sentence.translation.add(original_sentence)
+
+    return (original_sentence, translation_sentence), "Sentences stored and linked successfully."
+
 def store_sentence(sentence_text, language_name):
     """
     Store a sentence in the database.
@@ -46,3 +61,12 @@ def store_sentence(sentence_text, language_name):
     except Exception as e:
         return None, f"An error occured: {str(e)}"
 
+
+'''
+get dict with sentence/trasnlation pairs
+for each pair
+    store sentence
+    store translation
+    link sentence and translation
+
+'''
