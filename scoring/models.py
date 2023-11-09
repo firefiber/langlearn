@@ -39,4 +39,12 @@ class Score(models.Model):
         return f'{self.user_profile.user.username}: {self.score}'
 
 
+class ComparisonMode(models.Model):
+    MODE_CHOICES = [
+        ('A', 'Binary'),
+        ('B', 'Similarity'),
+    ]
+    mode = models.CharField(max_length=1, choices=MODE_CHOICES, default='B')
 
+    def __str__(self):
+        return self.get_mode_display()
