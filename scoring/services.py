@@ -6,6 +6,13 @@ from scoring.models import WordScore
 from fuzzywuzzy import process
 from unidecode import unidecode
 
+######
+from .models import ComparisonMode
+######
+
+
+
+
 class SentenceComparer:
     def __init__(self, language_code):
         self.language_manager = LanguageCodeManager(language_code)
@@ -14,6 +21,8 @@ class SentenceComparer:
         self.nlp = self.language_manager.nlp
         self.spell = self.language_manager.spell
         # self.tool = self.language_manager.tool
+
+        self.mode = ComparisonMode.objects.first().mode
 
     def normalize_sentence(self,s):
         return unidecode(s)
@@ -24,27 +33,48 @@ class SentenceComparer:
             return best_match
         return word
 
+    # def compare_sentences(self, correct_sentence, user_sentence):
+    #     # Tokenize sentences
+    #
+    #     correct_tokens = set(self.normalize_sentence(correct_sentence).split())
+    #     user_tokens = set(self.normalize_sentence(user_sentence).split())
+    #
+    #     user_tokens_corrected = set([self.get_best_match(word, correct_tokens) for word in user_tokens])
+    #
+    #     common_tokens = correct_tokens.intersection(user_tokens_corrected)
+    #
+    #     print(common_tokens)
+    #     word_scores = []
+    #
+    #     for word in common_tokens:
+    #         word_scores.append((word, 1))
+    #
+    #     # Calculate similarity ratio (number of common words divided by total number of user words)
+    #     if len(user_tokens) == 0:
+    #         similarity = 0
+    #     else:
+    #         similarity = len(common_tokens) / len(correct_tokens)
+    #
+    #     return {
+    #         "similarity": similarity,
+    #         "word_scores": word_scores
+    #     }
+
     def compare_sentences(self, correct_sentence, user_sentence):
-        # Tokenize sentences
-        
         correct_tokens = set(self.normalize_sentence(correct_sentence).split())
         user_tokens = set(self.normalize_sentence(user_sentence).split())
 
         user_tokens_corrected = set([self.get_best_match(word, correct_tokens) for word in user_tokens])
-
         common_tokens = correct_tokens.intersection(user_tokens_corrected)
 
-        print(common_tokens)
         word_scores = []
-
         for word in common_tokens:
-            word_scores.append((word, 1))
+            word_scores.append((word,1))
 
-        # Calculate similarity ratio (number of common words divided by total number of user words)
-        if len(user_tokens) == 0:
-            similarity = 0
+        if self.mode == 'B':
+            similarity = len(common_tokens)/len(correct_tokens) if user_tokens else 0
         else:
-            similarity = len(common_tokens) / len(correct_tokens)
+            similarity = 1 if correct_tokens == user_tokens_corrected else 0
 
         return {
             "similarity": similarity,
