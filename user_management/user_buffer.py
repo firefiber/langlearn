@@ -8,7 +8,9 @@ import datetime
 
 NEW_WORD_WEIGHT = 1.0  # configurable
 
+
 def fetch_user_info(username):
+    print("HERE")
     user_profile = UserProfile.objects.get(user__username=username)
     active_proficiency = user_profile.get_active_language_proficiency()
 
@@ -16,6 +18,8 @@ def fetch_user_info(username):
         raise Exception("No active learning language found for this user.")
 
     user_word_list = fetch_words_in_buffer(user_profile)
+    user_learned_words = fetch_user_words(user_profile)
+    learned_word_count = len(user_learned_words)
 
     # Including user_profile and active_proficiency in the result
     info = {
@@ -27,6 +31,7 @@ def fetch_user_info(username):
         'buffer_range_start': active_proficiency.buffer_range_start,
         'buffer_range_end': active_proficiency.buffer_range_end,
         'words': user_word_list,
+        'learned_word_count': learned_word_count
 
         # Include other fields from active_proficiency as needed
     }
@@ -52,7 +57,7 @@ def fetch_words_in_buffer(user_profile):
     return words_in_buffer
 
 
-def fetch_user_words(user_profile, language):
+def fetch_user_words(user_profile):
     """
     Fetch user-specific word data for a given user and language.
     """
@@ -67,6 +72,7 @@ def fetch_user_words(user_profile, language):
 
     # Filter the UserWords based on the main_buffer_word_list
     user_words = user_words_queryset.filter(word__in=main_buffer_word_list)
+
     return user_words
 
 
@@ -99,7 +105,7 @@ def calculate_practice_buffer(main_buffer, user_words, buffer_size):
     # Use weighted random selection to choose words for the practice buffer
     practice_buffer = np.random.choice(main_buffer, size=buffer_size, replace=False, p=weights)
     practice_buffer = [word.word for word in practice_buffer]
-    print(practice_buffer)
+    # print(practice_buffer)
     return list(practice_buffer)
 
 
@@ -112,9 +118,9 @@ def get_practice_buffer(username):
     language = user_info['learning_language']
 
     main_buffer = fetch_words_in_buffer(user_profile)
-    print("main_buffer", main_buffer)
-    user_words = fetch_user_words(user_profile, language)
-    print("user_words", user_words)
+    # print("main_buffer", main_buffer)
+    user_words = fetch_user_words(user_profile)
+    # print("user_words", user_words)
 
     practice_buffer = calculate_practice_buffer(main_buffer, user_words, 5)
 
