@@ -9,8 +9,6 @@ import json
 @login_required(login_url='/login/')
 @csrf_exempt
 def learning(request):
-    from django.conf import settings
-    print(settings.SETTINGS_MODULE)
     username = request.user.username
     global_round_manager.set_user(username)
     user_info = global_round_manager.user_info
@@ -22,6 +20,8 @@ def learning(request):
         'native_language': user_info['native_language'],
         'proficiency': user_info['proficiency'],
         'sentence': global_round_manager.get_sentence(),
+        'learned_word_count': user_info['learned_word_count'],
+
     }
 
     return render(request, 'main/home.html', context)

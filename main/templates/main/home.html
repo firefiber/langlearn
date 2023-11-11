@@ -17,7 +17,8 @@
 {% block content %}
     <div class="container mt-4">
         <h1 class="mb-4">Welcome, {{ username }}!</h1>
-        <p>You are learning {{ learning_language }}.</p>
+        <p>Learning language: {{ learning_language }}.</p>
+        <p>Learned words: {{ learned_word_count }}</p>
         <div class="mb-3">
             <label for="translation" class="form-label">Sentence:</label>
             <p id="translation" class="form-control">{{ sentence.translation }}</p>

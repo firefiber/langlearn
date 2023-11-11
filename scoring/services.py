@@ -98,10 +98,8 @@ class ScoreManager:
                 defaults={'proficiency_level': score, 'last_practiced': timezone.now()}
             )
 
-            # If the UserWord record already existed, update it
+            # If the UserWord record already exists, update it
             if not created:
-                # We could simply replace the proficiency level with the new score,
-                # or we could do some kind of average or weighted average. Here we're just replacing it.
                 user_word.proficiency_level = score
                 user_word.last_practiced = timezone.now()
                 user_word.save()
