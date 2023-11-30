@@ -1,3 +1,5 @@
+#TODO: Rework entire flow - lots of redundancy here.
+
 from django.core.cache import cache
 from user_management.models import UserProfile, UserLanguageProficiency
 from learning.models import UserWord
@@ -10,7 +12,6 @@ NEW_WORD_WEIGHT = 1.0  # configurable
 
 
 def fetch_user_info(username):
-    print("HERE")
     user_profile = UserProfile.objects.get(user__username=username)
     active_proficiency = user_profile.get_active_language_proficiency()
 
