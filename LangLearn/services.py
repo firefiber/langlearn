@@ -1,6 +1,6 @@
 #TODO: Check sentence buffer - seems issue with saving or retrieving.
-#TODO: Make sure "next" advances to next sentence in buffer
 #TODO: Only generate new sentences if less than 5 in buffer
+#TODO: Rework roundmanager - lots of redundancy.
 
 
 from queue import Queue
