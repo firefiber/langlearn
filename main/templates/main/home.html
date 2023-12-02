@@ -16,6 +16,8 @@
 
 {% block content %}
     <div class="container mt-4">
+        <div id="app"></div>
+        <script src="{% static 'js/app.24418e04.js' %}"></script>
         <h1 class="mb-4">Welcome, {{ username }}!</h1>
         <p>Learning language: {{ learning_language }}.</p>
         <p>Learned words: {{ learned_word_count }}</p>
@@ -24,7 +26,7 @@
             <p id="translation" class="form-control">{{ sentence.translation }}</p>
         </div>
 
-        <!-- TODO: REMOVE THIS FOR PROD!  -->
+        <!-- TODO: REMOVE THIS FOR PROD!  -->D
 
         <div class="mb-3">
             <label for="sentence" class="form-label">Answer:</label>

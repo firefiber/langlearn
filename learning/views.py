@@ -21,7 +21,6 @@ def learning(request):
         'proficiency': user_info['proficiency'],
         'sentence': global_round_manager.get_sentence(),
         'learned_word_count': user_info['learned_word_count'],
-
     }
 
     return render(request, 'main/home.html', context)
