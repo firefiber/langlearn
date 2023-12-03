@@ -15,7 +15,9 @@ from dotenv import load_dotenv
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
+BASE_DIR = os.path.join(ROOT_DIR, 'backend')
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -71,7 +73,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # 'DIRS': [BASE_DIR / 'templates']
-        'DIRS': [os.path.join(BASE_DIR, 'templates'), 'D:/langlearn_frontend/dist']
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), os.path.join(ROOT_DIR, 'frontend/dist')]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -142,7 +144,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),
-                    'D:/langlearn_frontend/dist',]
+                    os.path.join(ROOT_DIR, 'frontend/dist'),]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
