@@ -15,6 +15,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     learning_languages = models.ManyToManyField(Language, through='UserLanguageProficiency', related_name='learning_users')
     native_language = models.ForeignKey(Language, related_name='native_language', on_delete=models.SET_NULL, null=True, blank=True)
+    activated = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username

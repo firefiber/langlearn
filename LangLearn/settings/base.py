@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 from dotenv import load_dotenv
+from datetime import timedelta
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -33,6 +35,21 @@ DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
+CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'http://127.0.0.1:8000']
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+}
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,6 +59,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'djoser',
+    'corsheaders',
     # CUSTOM APPS
     'main.apps.MainConfig',
     'feedback.apps.FeedbackConfig',
@@ -64,6 +85,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
@@ -144,7 +166,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),
-                    os.path.join(ROOT_DIR, 'frontend/dist'),]
+                    os.path.join(ROOT_DIR, 'frontend/dist/'),]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -157,7 +179,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
-LOGIN_REDIRECT_URL = '/learning/'
+# LOGIN_REDIRECT_URL = '/learning/'
 
 LOGOUT_REDIRECT_URL = '/'
 
@@ -167,3 +189,27 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(BASE_DIR, 'path_to_vue_project/webpack-stats.json'),
     }
 }
+
+# EMAIL_BACKEND
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'your_smtp_host'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your_email_address'
+EMAIL_HOST_PASSWORD = 'your_email_password'
+
+# DJOSER
+
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+}
+
+# SESSION_COOKIE_SETTINGS
+
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = True  # Set to False if not using HTTPS
+CSRF_COOKIE_SECURE = True  # Set to False if not using HTTPS
+CSRF_COOKIE_HTTPONLY = True
