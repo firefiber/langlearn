@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config
+# from decouple import Config
 from dotenv import load_dotenv
 from datetime import timedelta
 import os
