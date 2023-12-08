@@ -9,7 +9,13 @@ This model is referenced by other models to link user_management, words, and sen
 
 
 class Language(models.Model):
+    LANGUAGE_CATEGORIES = (
+        ('L', 'Learning'),
+        ('N', 'Native'),
+        ('B', 'Both')
+    )
     name = models.CharField(max_length=100)
+    category = models.CharField(max_length=1, choices=LANGUAGE_CATEGORIES, default='B')
 
     def __str__(self):
         return self.name
