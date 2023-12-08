@@ -1,4 +1,5 @@
 from .base import *
 
-# CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'http:']
-print("dev settings loaded")
+CSRF_TRUSTED_ORIGINS = ['https://langlearn-development.up.railway.app']
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
