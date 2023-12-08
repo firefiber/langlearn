@@ -22,9 +22,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('djoser.urls')),
     path('api/v1/', include('djoser.urls.jwt')),
-    path('auth/', include('user_management.urls'))
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
+    path('user/', include('user_management.urls'))
 ]
 
+    # path('auth/', include('user_management.urls'))
 # path('', include('main.urls')),
 # path('learning/', include('learning.urls')),
 # path('register/', RegisterView.as_view(template_name='user_management/register.html'), name='register'),

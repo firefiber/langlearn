@@ -1,3 +1,5 @@
+#TODO: Move language proficiency model to learning models - better separation (HUGE WORK!! - lots of places referenced)
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import JSONField
@@ -15,7 +17,6 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     learning_languages = models.ManyToManyField(Language, through='UserLanguageProficiency', related_name='learning_users')
     native_language = models.ForeignKey(Language, related_name='native_language', on_delete=models.SET_NULL, null=True, blank=True)
-    activated = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
