@@ -182,5 +182,3 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(BASE_DIR, 'path_to_vue_project/webpack-stats.json'),
     }
 }
-
-
