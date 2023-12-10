@@ -1,5 +1,12 @@
 from .base import *
-# CSRF_TRUSTED_ORIGINS = ['https://langlearn-development.up.railway.app']
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-print("local")
+############################################## COOKIES
+
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+
+############################################## EMAIL
+
+EMAIL_BACKEND = config('EMAIL_BACKEND')
+

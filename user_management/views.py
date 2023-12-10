@@ -41,6 +41,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import UserSerializer
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 
 class CustomLoginView(APIView):
@@ -57,7 +59,7 @@ class CustomLoginView(APIView):
         return Response({'detail': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class CustomLogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         logout(request)
