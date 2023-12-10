@@ -1,19 +1,3 @@
-"""
-URL configuration for LangLearn project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.contrib.auth.views import LoginView, LogoutView, TemplateView
@@ -21,15 +5,9 @@ from django.contrib.auth.views import LoginView, LogoutView, TemplateView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('djoser.urls')),
-    path('api/v1/', include('djoser.urls.jwt')),
     path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.jwt')),
-    path('user/', include('user_management.urls'))
+    path('user/', include('user_management.urls')),
+    path('', TemplateView.as_view(template_name='index.html')),
+    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
 ]
 
-    # path('auth/', include('user_management.urls'))
-# path('', include('main.urls')),
-# path('learning/', include('learning.urls')),
-# path('register/', RegisterView.as_view(template_name='user_management/register.html'), name='register'),
-# path('login/', LoginView.as_view(template_name='user_management/login.html'), name='login'),
-# path('logout/', LogoutView.as_view(), name='logout'),
