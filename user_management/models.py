@@ -14,7 +14,7 @@ Each user profile has learning languages, a native language, a buffer size, and 
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
     learning_languages = models.ManyToManyField(Language, through='UserLanguageProficiency', related_name='learning_users')
     native_language = models.ForeignKey(Language, related_name='native_language', on_delete=models.SET_NULL, null=True, blank=True)
 
