@@ -33,32 +33,6 @@ class SentenceComparer:
             return best_match
         return word
 
-    # def compare_sentences(self, correct_sentence, user_sentence):
-    #     # Tokenize sentences
-    #
-    #     correct_tokens = set(self.normalize_sentence(correct_sentence).split())
-    #     user_tokens = set(self.normalize_sentence(user_sentence).split())
-    #
-    #     user_tokens_corrected = set([self.get_best_match(word, correct_tokens) for word in user_tokens])
-    #
-    #     common_tokens = correct_tokens.intersection(user_tokens_corrected)
-    #
-    #     print(common_tokens)
-    #     word_scores = []
-    #
-    #     for word in common_tokens:
-    #         word_scores.append((word, 1))
-    #
-    #     # Calculate similarity ratio (number of common words divided by total number of user words)
-    #     if len(user_tokens) == 0:
-    #         similarity = 0
-    #     else:
-    #         similarity = len(common_tokens) / len(correct_tokens)
-    #
-    #     return {
-    #         "similarity": similarity,
-    #         "word_scores": word_scores
-    #     }
 
     def compare_sentences(self, correct_sentence, user_sentence):
         correct_tokens = set(self.normalize_sentence(correct_sentence).split())
@@ -111,3 +85,33 @@ class ScoreManager:
                 score=score,
                 date=timezone.now()
             )
+
+
+
+
+    # def compare_sentences(self, correct_sentence, user_sentence):
+    #     # Tokenize sentences
+    #
+    #     correct_tokens = set(self.normalize_sentence(correct_sentence).split())
+    #     user_tokens = set(self.normalize_sentence(user_sentence).split())
+    #
+    #     user_tokens_corrected = set([self.get_best_match(word, correct_tokens) for word in user_tokens])
+    #
+    #     common_tokens = correct_tokens.intersection(user_tokens_corrected)
+    #
+    #     print(common_tokens)
+    #     word_scores = []
+    #
+    #     for word in common_tokens:
+    #         word_scores.append((word, 1))
+    #
+    #     # Calculate similarity ratio (number of common words divided by total number of user words)
+    #     if len(user_tokens) == 0:
+    #         similarity = 0
+    #     else:
+    #         similarity = len(common_tokens) / len(correct_tokens)
+    #
+    #     return {
+    #         "similarity": similarity,
+    #         "word_scores": word_scores
+    #     }
