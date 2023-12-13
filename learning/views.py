@@ -64,6 +64,11 @@ from scoring.services import SentenceComparer, ScoreManager
 #     else:
 #         return HttpResponseNotAllowed(['POST'])
 
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from .serializers import LearningViewResponseSerializer  # Import the serializer you just created
+
 class LearningView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -72,20 +77,27 @@ class LearningView(APIView):
         round_manager = RoundManager()
         round_manager.initialize_round(username)
 
-        next_sentence = round_manager.get_next_sentence()
         round_info = round_manager.get_round_info()
 
-        response_data = {
-            'username': round_info['user_info']['username'],
-            'learning_language': round_info['user_info']['learning_language'],
-            'native_language': round_info['user_info']['native_language'],
-            'proficiency': round_info['user_info']['proficiency'],
-            'sentence': next_sentence,
-            'learned_word_count': round_info['user_info']['learned_word_count'],
-            'remaining_sentences_in_round': round_info['buffer_size']
-        }
+        # Check if round_info is not None
+        if round_info:
+            # Prepare the data for the serializer
+            data = {
+                'username': username,
+                'learning_language': {'name': round_info['user_info']['learning_language'].name},
+                'native_language': {'name': round_info['user_info']['native_language'].name},
+                'proficiency': round_info['user_info']['proficiency'],
+                'buffer': round_info['buffer'],  # The entire buffer
+                'learned_word_count': round_info['user_info']['learned_word_count'],
+            }
 
-        return Response(response_data)
+            # Use the serializer to format the response data
+            serializer = LearningViewResponseSerializer(data=data)
+            if serializer.is_valid():
+                return Response(serializer.data)
+            return Response(serializer.errors, status=400)
+        else:
+            return Response({'error': 'Round information could not be retrieved'}, status=400)
 
 
 # class NextSentenceView(APIView):

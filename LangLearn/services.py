@@ -51,6 +51,7 @@ from user_management.user_buffer import fetch_user_info, get_practice_buffer
 from learning.services.generate_sentences import from_openai_chat
 from languages.services import store_sentence_translation_pair
 
+
 class Round:
     def __init__(self, user_info, buffer):
         self.user_info = user_info
@@ -66,6 +67,7 @@ class RoundManager:
         user_practice_buffer = get_practice_buffer(username)
 
         generated_sentences = self._generate_sentences(user_info, user_practice_buffer)
+        print(generated_sentences)
         self.current_round = Round(user_info, generated_sentences)
 
     def _generate_sentences(self, user_info, user_practice_buffer):
@@ -76,24 +78,62 @@ class RoundManager:
             user_practice_buffer
         )
 
-        buffer = Queue()
-        for pair in generated_sentences:
-            buffer.put(pair)
-            stored_pair, message = store_sentence_translation_pair(pair)
-            # Handle storage and messages as needed
-
-        return buffer
-
-    def get_next_sentence(self):
-        if self.current_round and not self.current_round.buffer.empty():
-            return self.current_round.buffer.get()
-        return None  # Or handle empty buffer scenario
+        # Convert to list as the buffer is now expected to be a list
+        return [sentence for sentence in generated_sentences]
 
     def get_round_info(self):
         if self.current_round:
             return {
                 "user_info": self.current_round.user_info,
-                "buffer_size": self.current_round.buffer.qsize(),
+                "buffer": self.current_round.buffer,
                 "history": self.current_round.history
             }
         return None
+
+
+# class Round:
+#     def __init__(self, user_info, buffer):
+#         self.user_info = user_info
+#         self.buffer = buffer
+#         self.history = []
+#
+# class RoundManager:
+#     def __init__(self):
+#         self.current_round = None
+#
+#     def initialize_round(self, username):
+#         user_info = fetch_user_info(username)
+#         user_practice_buffer = get_practice_buffer(username)
+#
+#         generated_sentences = self._generate_sentences(user_info, user_practice_buffer)
+#         self.current_round = Round(user_info, generated_sentences)
+#
+#     def _generate_sentences(self, user_info, user_practice_buffer):
+#         generated_sentences = from_openai_chat(
+#             user_info['learning_language'],
+#             user_info['native_language'],
+#             user_info['proficiency'],
+#             user_practice_buffer
+#         )
+#
+#         buffer = Queue()
+#         for pair in generated_sentences:
+#             buffer.put(pair)
+#             stored_pair, message = store_sentence_translation_pair(pair)
+#             # Handle storage and messages as needed
+#
+#         return buffer
+#
+#     def get_next_sentence(self):
+#         if self.current_round and not self.current_round.buffer.empty():
+#             return self.current_round.buffer.get()
+#         return None  # Or handle empty buffer scenario
+#
+#     def get_round_info(self):
+#         if self.current_round:
+#             return {
+#                 "user_info": self.current_round.user_info,
+#                 "buffer_size": self.current_round.buffer.qsize(),
+#                 "history": self.current_round.history
+#             }
+#         return None

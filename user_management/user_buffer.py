@@ -24,7 +24,7 @@ def fetch_user_info(username):
 
     # Including user_profile and active_proficiency in the result
     info = {
-        'user_profile': user_profile,
+        'username': username,
         'learning_language': active_proficiency.language,
         'native_language': user_profile.native_language,
         'proficiency': active_proficiency.proficiency_level,
@@ -115,7 +115,7 @@ def get_practice_buffer(username):
     Main function that fetches the user's information, main buffer, user words, and calculates the practice buffer.
     """
     user_info = fetch_user_info(username)
-    user_profile = user_info['user_profile']
+    user_profile = UserProfile.objects.get(user__username=username)
     language = user_info['learning_language']
 
     main_buffer = fetch_words_in_buffer(user_profile)
