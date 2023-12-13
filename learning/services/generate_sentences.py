@@ -57,8 +57,8 @@ def clean_openai_output(output, learning_language, native_language):
                 "word": word.strip(),
                 "sentence": sentence.strip(),
                 "translation": translation.strip(),
-                "sentence_language": learning_language,
-                "translation_language": native_language
+                "sentence_language": learning_language.name,
+                "translation_language": native_language.name
             })
     return cleaned_output
 
