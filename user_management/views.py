@@ -21,7 +21,7 @@ class CustomLoginView(APIView):
         return Response({'detail': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class CustomLogoutView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         logout(request)
@@ -36,13 +36,13 @@ class CustomSessionView(APIView):
         return Response({"detail": "User is authenticated"}, status=status.HTTP_200_OK)
 
 
-class UserRegistrationView(APIView):
-    permission_classes = [AllowAny]
-    def post(self, request, *args, **kwargs):
-        with transaction.atomic():
-            serializer = UserSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class UserRegistrationView(APIView):
+#     permission_classes = [AllowAny]
+#     def post(self, request, *args, **kwargs):
+#         with transaction.atomic():
+#             serializer = UserSerializer(data=request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

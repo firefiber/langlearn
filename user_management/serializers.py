@@ -6,9 +6,9 @@ from .models import UserProfile, UserLanguageProficiency, Language
 
 class UserProfileSerializer(serializers.ModelSerializer):
     native_language = serializers.PrimaryKeyRelatedField(
-        queryset=Language.objects.all(), write_only=True)
+        queryset=Language.objects.filter(category__in=['N', 'B']), write_only=True)
     learning_language_id = serializers.PrimaryKeyRelatedField(
-        queryset=Language.objects.all(), write_only=True)
+        queryset=Language.objects.filter(category__in=['L', 'B']), write_only=True)
 
     class Meta:
         model = UserProfile
@@ -32,7 +32,7 @@ class UserSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             email=validated_data['email'],
             password=make_password(validated_data['password']),
-            is_active=False
+            is_active=True
         )
         user.save()
 
