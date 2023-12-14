@@ -1,8 +1,14 @@
-from LangLearn.services import RoundManager
-from rest_framework.views import APIView
+#TODO: Restructure - either move compare to Scoring, or make a separate api module
+
+from django.db.models import Q
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from user_management.models import UserProfile
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.pagination import LimitOffsetPagination
+from .models import UserWord
+from .serializers import UserWordSerializer, LearningViewResponseSerializer
+from datetime import datetime
+from LangLearn.services import RoundManager
 from scoring.services import SentenceComparer, ScoreManager
 
 
@@ -64,16 +70,12 @@ from scoring.services import SentenceComparer, ScoreManager
 #     else:
 #         return HttpResponseNotAllowed(['POST'])
 
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from .serializers import LearningViewResponseSerializer  # Import the serializer you just created
-
 class LearningView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         username = request.user.username
+        print(username)
         round_manager = RoundManager()
         round_manager.initialize_round(username)
 
@@ -94,10 +96,15 @@ class LearningView(APIView):
             # Use the serializer to format the response data
             serializer = LearningViewResponseSerializer(data=data)
             if serializer.is_valid():
+                print(Response(serializer.data).items())
                 return Response(serializer.data)
             return Response(serializer.errors, status=400)
         else:
             return Response({'error': 'Round information could not be retrieved'}, status=400)
+
+    def post(self, request):
+        return Response({"error": "Method not allowed"}, status=405)
+
 
 
 # class NextSentenceView(APIView):
@@ -115,7 +122,7 @@ class LearningView(APIView):
 #         return Response(response_data)
 
 class CompareView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request):
         user_sentence = request.data.get('user_sentence')
@@ -138,4 +145,39 @@ class CompareView(APIView):
     def get(self, request):
         return Response({"error": "Method not allowed"}, status=405)
 
+
+class UserWordsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user_profile = request.user.userprofile
+        proficiency_min = request.query_params.get('proficiency_min', 0.0)
+        proficiency_max = request.query_params.get('proficiency_max', None)
+        date_min = request.query_params.get('date_min', None)
+        date_max = request.query_params.get('date_max', None)
+        return_words = request.query_params.get('return_words', 'false').lower() == 'true'
+
+        # Build the query
+        query = Q(user_profile=user_profile, proficiency_level__gte=proficiency_min)
+        if proficiency_max:
+            query &= Q(proficiency_level__lte=proficiency_max)
+        if date_min:
+            query &= Q(last_practiced__gte=datetime.fromisoformat(date_min))
+        if date_max:
+            query &= Q(last_practiced__lte=datetime.fromisoformat(date_max))
+
+        queryset = UserWord.objects.filter(query)
+
+        if return_words:
+            paginator = LimitOffsetPagination()
+            result_page = paginator.paginate_queryset(queryset, request)
+            serializer = UserWordSerializer(result_page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        # Default behavior: return count
+        count = queryset.count()
+        return Response({'count': count})
+
+    def post(self, request):
+        return Response({"error": "Method not allowed"}, status=405)
 

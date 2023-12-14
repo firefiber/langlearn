@@ -1,5 +1,3 @@
-#TODO: Move language proficiency model to learning models - better separation (HUGE WORK!! - lots of places referenced)
-
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import JSONField
