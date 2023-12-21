@@ -11,8 +11,6 @@ from .models import ComparisonMode
 ######
 
 
-
-
 class SentenceComparer:
     def __init__(self, language_code):
         self.language_manager = LanguageCodeManager(language_code)
@@ -43,7 +41,7 @@ class SentenceComparer:
 
         word_scores = []
         for word in common_tokens:
-            word_scores.append((word,1))
+            word_scores.append((word,1.0))
 
         if self.mode == 'B':
             similarity = len(common_tokens)/len(correct_tokens) if user_tokens else 0

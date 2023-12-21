@@ -1,8 +1,67 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
-from .models import UserProfile, UserLanguageProficiency, Language
 
+from learning.models import UserWord
+from .models import UserProfile, UserLanguageProficiency
+from languages.models import Language, Word
+from datetime import datetime, timedelta
+
+class LearningLanguageSerializer(serializers.ModelSerializer):
+    language_name = serializers.CharField(source='language.name')
+
+    class Meta:
+        model = UserLanguageProficiency
+        fields = ['language_name', 'is_active']
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+    native_language = serializers.CharField(source='native_language.name')
+    learning_languages = serializers.SerializerMethodField()
+    learning_since = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserProfile
+        fields = ['username', 'native_language', 'learning_languages', 'learning_since']
+
+    def get_learning_languages(self, obj):
+        # Get learning languages with their 'is_active' status
+        learning_languages = {prof.language.name: prof.is_active for prof in obj.userlanguageproficiency_set.all()}
+        return learning_languages
+
+    def get_learning_since(self, obj):
+        return obj.user.date_joined.strftime("%Y-%m-%d") if obj.user.date_joined else None
+
+class UserTrainingDataSerializer(serializers.ModelSerializer):
+    proficiency = serializers.FloatField(source='proficiency_level')
+    word_bank_count = serializers.SerializerMethodField()
+    streak = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserLanguageProficiency
+        fields = ['proficiency', 'word_bank_count', 'streak']
+
+    def get_word_bank_count(self, obj):
+        # Fetch all UserWord instances for the user
+        user_words = UserWord.objects.filter(user_profile=obj.user_profile)
+        # Fetch all Word instances for the active language
+        words_in_language = Word.objects.filter(language=obj.language).values_list('word', flat=True)
+
+        # Count how many user words are in the words of the active language
+        word_bank_count = sum(1 for user_word in user_words if user_word.word in words_in_language)
+
+        return word_bank_count
+    def get_streak(self, obj):
+        # Logic to calculate the streak goes here
+        # This is a placeholder logic, modify it according to your actual streak calculation
+        today = datetime.now().date()
+        streak = 0
+        for i in range(30):  # Check the last 30 days as an example
+            if UserWord.objects.filter(user_profile=obj.user_profile, last_practiced__date=today - timedelta(days=i)).exists():
+                streak += 1
+            else:
+                break
+        return streak
 
 class UserProfileSerializer(serializers.ModelSerializer):
     native_language = serializers.PrimaryKeyRelatedField(
@@ -14,7 +73,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ['native_language', 'learning_language_id']
 
-class UserSerializer(serializers.ModelSerializer):
+class UserRegistrationSerializer(serializers.ModelSerializer):
     userprofile = UserProfileSerializer()
     password = serializers.CharField(write_only=True)
 

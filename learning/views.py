@@ -146,12 +146,12 @@ class CompareView(APIView):
         return Response({"error": "Method not allowed"}, status=405)
 
 
-class UserWordsAPIView(APIView):
+class UserWordsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         user_profile = request.user.userprofile
-        proficiency_min = request.query_params.get('proficiency_min', 0.0)
+        proficiency_min = request.query_params.get('proficiency_min', 0.5)
         proficiency_max = request.query_params.get('proficiency_max', None)
         date_min = request.query_params.get('date_min', None)
         date_max = request.query_params.get('date_max', None)
@@ -181,3 +181,20 @@ class UserWordsAPIView(APIView):
     def post(self, request):
         return Response({"error": "Method not allowed"}, status=405)
 
+class SessionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        username = request.user.username
+        round_manager = RoundManager()
+        round_manager.initialize_round(username)
+
+        round_info = round_manager.get_round_info()
+
+        if round_info:
+            # Structure the response data
+            buffer_data = [{'word': item['word'], 'sentence': item['sentence'], 'translation': item['translation']}
+                           for item in round_info['buffer']]
+            return Response(buffer_data)
+        else:
+            return Response({'error': 'Session data could not be retrieved'}, status=400)
