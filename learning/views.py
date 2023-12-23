@@ -122,11 +122,12 @@ class LearningView(APIView):
 #         return Response(response_data)
 
 class CompareView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         user_sentence = request.data.get('user_sentence')
         correct_sentence = request.data.get('original_sentence')
+        print("user_sentence: " + user_sentence, "correct" + correct_sentence)
 
         # Use request.user directly, which is the authenticated user
         user_profile = request.user.userprofile

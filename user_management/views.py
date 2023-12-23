@@ -55,7 +55,6 @@ class CustomSessionView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        # If the request reaches here, the user is authenticated
         return Response({"detail": "User is authenticated"}, status=status.HTTP_200_OK)
 
 class UserDataView(APIView):
