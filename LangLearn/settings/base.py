@@ -5,8 +5,8 @@ import os
 
 ############################################## PROJECT DIRECTORIES
 
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
-BASE_DIR = os.path.join(ROOT_DIR, 'backend')
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+# BASE_DIR = os.path.join(ROOT_DIR, 'backend')
 
 ############################################## DJANGO SETTINGS
 
@@ -87,7 +87,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # 'DIRS': [BASE_DIR / 'templates']
-        'DIRS': [os.path.join(BASE_DIR, 'templates'), os.path.join(ROOT_DIR, 'frontend/dist')]
+        'DIRS': []
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -135,7 +135,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ############################################## STATIC FILES
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), os.path.join(ROOT_DIR, 'frontend/dist/')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

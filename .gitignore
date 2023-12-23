@@ -11,7 +11,8 @@
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
-.idea/*
+.idea/LangLearn.iml
+.idea/misc.xml
 
 # AWS User-specific
 .idea/**/aws.xml
@@ -300,3 +301,5 @@ pyvenv.cfg
 pip-selfcheck.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm,venv
+
+TODO.md
