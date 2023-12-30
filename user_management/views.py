@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.middleware.csrf import get_token
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,8 +16,12 @@ class CustomLoginView(APIView):
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
-            # Session ID is automatically set in the cookie
-            return Response({'detail': 'Login successful'}, status=status.HTTP_200_OK)
+            csrf_token = get_token(request)
+            print(csrf_token)
+            return Response({
+                'detail': 'Login successful',
+                'csrfToken': csrf_token
+            }, status=status.HTTP_200_OK)
         return Response({'detail': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 # class CustomLoginView(APIView):
@@ -55,7 +60,11 @@ class CustomSessionView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        return Response({"detail": "User is authenticated"}, status=status.HTTP_200_OK)
+        csrf_token = get_token(request)
+        return Response({
+            'detail': 'User is authenticated',
+            'csrfToken': csrf_token
+        }, status=status.HTTP_200_OK)
 
 class UserDataView(APIView):
     permission_classes = [IsAuthenticated]
