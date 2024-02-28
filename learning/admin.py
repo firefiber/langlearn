@@ -1,8 +1,8 @@
 from django.contrib import admin
-from .models import UserWord, UserSentence
+from .models import UserWordBank, UserSentence
 
 admin.site.register(UserSentence)
-admin.site.register(UserWord)
+admin.site.register(UserWordBank)
 
 
 

@@ -1,7 +1,7 @@
 import textdistance
 from utils.languge_code_manager import LanguageCodeManager
 from django.utils import timezone
-from learning.models import Word, UserWord, Sentence, UserSentence, UserPracticeBuffer
+from learning.models import Word, UserWordBank, Sentence, UserSentence, UserPracticeBuffer
 from scoring.models import WordScore
 from fuzzywuzzy import process
 from unidecode import unidecode
@@ -64,7 +64,7 @@ class ScoreManager:
         # update UserWord and WordScore models for each word and score
         for word, score in word_scores:
             # Check if a UserWord record already exists for this user and word
-            user_word, created = UserWord.objects.get_or_create(
+            user_word, created = UserWordBank.objects.get_or_create(
                 user_profile=self.user_profile,
                 word=word,
                 defaults={'proficiency_level': score, 'last_practiced': timezone.now()}

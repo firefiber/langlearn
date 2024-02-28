@@ -2,7 +2,7 @@
 
 from django.core.cache import cache
 from user_management.models import UserProfile, UserLanguageProficiency
-from learning.models import UserWord
+from learning.models import UserWordBank
 from languages.models import Word
 import numpy as np
 from django.utils import timezone
@@ -66,10 +66,10 @@ def fetch_user_words(user_profile):
     main_buffer = fetch_words_in_buffer(user_profile)
 
     # Extract word list from main buffer
-    main_buffer_word_list = [word.word for word in main_buffer]
+    main_buffer_word_list = [word.wordItem for word in main_buffer]
 
     # Fetch UserWords for the user and language
-    user_words_queryset = UserWord.objects.filter(user_profile=user_profile)
+    user_words_queryset = UserWordBank.objects.filter(user_profile=user_profile)
 
     # Filter the UserWords based on the main_buffer_word_list
     user_words = user_words_queryset.filter(word__in=main_buffer_word_list)
@@ -77,17 +77,21 @@ def fetch_user_words(user_profile):
     return user_words
 
 
+def fetch_user_deposits(user_profile):
+
+    user_word_deposits = User
+
 def calculate_practice_buffer(main_buffer, user_words, buffer_size):
     """
     Calculate practice buffer based on the user's main buffer, user words and other criteria.
     """
     # Create a list of user words for easy look-up
-    user_word_dict = {user_word.word: user_word for user_word in user_words}
+    user_word_dict = {user_word.wordItem: user_word for user_word in user_words}
 
     # Calculate weights for all words in the buffer
     weights = []
     for word in main_buffer:
-        user_word = user_word_dict.get(word.word)
+        user_word = user_word_dict.get(word.wordItem)
         # print(user_word.last_practiced, ", ", user_word.proficiency_level)
 
         if user_word:
@@ -105,7 +109,7 @@ def calculate_practice_buffer(main_buffer, user_words, buffer_size):
 
     # Use weighted random selection to choose words for the practice buffer
     practice_buffer = np.random.choice(main_buffer, size=buffer_size, replace=False, p=weights)
-    practice_buffer = [word.word for word in practice_buffer]
+    practice_buffer = [word.wordItem for word in practice_buffer]
     # print(practice_buffer)
     return list(practice_buffer)
 
@@ -119,9 +123,10 @@ def get_practice_buffer(username):
     language = user_info['learning_language']
 
     main_buffer = fetch_words_in_buffer(user_profile)
-    # print("main_buffer", main_buffer)
+
     user_words = fetch_user_words(user_profile)
-    # print("user_words", user_words)
+
+    user_deposits = fetch_user_deposits(user_profile)
 
     practice_buffer = calculate_practice_buffer(main_buffer, user_words, 5)
 

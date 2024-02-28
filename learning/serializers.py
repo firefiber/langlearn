@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from languages.models import Language
-from .models import UserWord
+from .models import UserWordBank
 
 class LanguageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,6 +26,6 @@ class LearningViewResponseSerializer(serializers.Serializer):
 
 class UserWordSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserWord
-        fields = ['word', 'proficiency_level', 'last_practiced']
+        model = UserWordBank
+        fields = ['wordItem', 'proficiency_level', 'last_practiced']
 

@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import CheckConstraint, Q
+from django.core.validators import MaxValueValidator, MinValueValidator
 from user_management.models import UserProfile
 from languages.models import Language, Word, Sentence
 
@@ -9,9 +11,9 @@ words and each word can be learned by many user_management.
 '''
 
 
-class UserWord(models.Model):
+class UserWordBank(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    word = models.CharField(max_length=100)
+    wordItem = models.CharField(max_length=100)
     proficiency_level = models.FloatField()
     last_practiced = models.DateTimeField(auto_now=True)
 
@@ -19,8 +21,25 @@ class UserWord(models.Model):
         indexes = [models.Index(fields=['user_profile', 'word']), ]
 
     def __str__(self):
-        return f'{self.user_profile.user.username}: {self.word}'
+        return f'{self.user_profile.user.username}: {self.wordItem}'
 
+
+class UserWordDeposit(models.Model):
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_word = models.CharField(max_length=100)
+    date_of_entry = models.DateTimeField(auto_now_add=True)
+    weight = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
+    )
+
+    class Meta:
+        indexes = [models.Index(fields=['user_profile', 'word', 'weight', 'date_of_entry']), ]
+        constraints = (
+            CheckConstraint(
+                check=Q(weight__gte=0.0) & Q(weight__lte=1.0),
+                name='UserWordDeposit_weight_range'
+            )
+        )
 
 '''
 This model records which sentences a user is learning, their current proficiency level with each sentence, 

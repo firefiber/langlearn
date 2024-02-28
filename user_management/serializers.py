@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 
-from learning.models import UserWord
+from learning.models import UserWordBank
 from .models import UserProfile, UserLanguageProficiency
 from languages.models import Language, Word
 from datetime import datetime, timedelta
@@ -43,12 +43,12 @@ class UserTrainingDataSerializer(serializers.ModelSerializer):
 
     def get_word_bank_count(self, obj):
         # Fetch all UserWord instances for the user
-        user_words = UserWord.objects.filter(user_profile=obj.user_profile)
+        user_words = UserWordBank.objects.filter(user_profile=obj.user_profile)
         # Fetch all Word instances for the active language
         words_in_language = Word.objects.filter(language=obj.language).values_list('word', flat=True)
 
         # Count how many user words are in the words of the active language
-        word_bank_count = sum(1 for user_word in user_words if user_word.word in words_in_language)
+        word_bank_count = sum(1 for user_word in user_words if user_word.wordItem in words_in_language)
 
         return word_bank_count
     def get_streak(self, obj):
@@ -57,7 +57,7 @@ class UserTrainingDataSerializer(serializers.ModelSerializer):
         today = datetime.now().date()
         streak = 0
         for i in range(30):  # Check the last 30 days as an example
-            if UserWord.objects.filter(user_profile=obj.user_profile, last_practiced__date=today - timedelta(days=i)).exists():
+            if UserWordBank.objects.filter(user_profile=obj.user_profile, last_practiced__date=today - timedelta(days=i)).exists():
                 streak += 1
             else:
                 break

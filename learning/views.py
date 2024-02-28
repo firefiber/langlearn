@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.pagination import LimitOffsetPagination
-from .models import UserWord
+from .models import UserWordBank
 from .serializers import UserWordSerializer, LearningViewResponseSerializer
 from datetime import datetime
 from LangLearn.services import RoundManager
@@ -93,7 +93,7 @@ class UserWordsView(APIView):
         if date_max:
             query &= Q(last_practiced__lte=datetime.fromisoformat(date_max))
 
-        queryset = UserWord.objects.filter(query)
+        queryset = UserWordBank.objects.filter(query)
 
         if return_words:
             paginator = LimitOffsetPagination()
