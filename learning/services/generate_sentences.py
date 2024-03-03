@@ -1,23 +1,25 @@
 import os
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-openai.api_key = os.getenv('OPENAI_API_KEY')
 
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY")
+)
 
 def from_openai_chat(learning_language, native_language, proficiency, words, theme=None):
     sentences = []
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+    response = client.chat.completions.create(
+        model="gpt-4-turbo-preview",
         messages=[
             {
                 "role": "system",
                 "content": "You are a skilled digital language tutor."
                            "The user will provide you with the following information:"
-                           " - The language they are learning (learning language)"
-                           " - Their native language (native language)"
+                           " - The language they are learning (learning_language)"
+                           " - Their native language (native_language)"
                            " - Their proficiency level in the learning language"
                            " - A theme (optional)"
                            " - A list of words they want to use in sentences"
