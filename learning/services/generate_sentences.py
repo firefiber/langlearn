@@ -41,7 +41,7 @@ def from_openai_chat(learning_language, native_language, proficiency, words, the
     )
 
     # Extract the output
-    output = response['choices'][0]['message']['content']
+    output = response.choices[0].message.content
     cleaned_output = clean_openai_output(output, learning_language, native_language)
     return cleaned_output
 
