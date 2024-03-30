@@ -11,7 +11,7 @@ def from_openai_chat(learning_language, native_language, proficiency, words, the
     sentences = []
 
     response = client.chat.completions.create(
-        model="gpt-4-turbo-preview",
+        model="gpt-4",
         messages=[
             {
                 "role": "system",
