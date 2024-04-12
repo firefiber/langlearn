@@ -2,17 +2,15 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 
-load_dotenv()
 
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+load_dotenv()
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 def from_openai_chat(learning_language, native_language, proficiency, words, theme=None):
     sentences = []
 
     response = client.chat.completions.create(
-        model="gpt-4-turbo-preview",
+        model="gpt-4",
         messages=[
             {
                 "role": "system",
@@ -42,7 +40,7 @@ def from_openai_chat(learning_language, native_language, proficiency, words, the
     )
 
     # Extract the output
-    output = response['choices'][0]['message']['content']
+    output = response.choices[0].message.content
     cleaned_output = clean_openai_output(output, learning_language, native_language)
     return cleaned_output
 
