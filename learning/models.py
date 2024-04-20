@@ -18,7 +18,7 @@ class UserWordBank(models.Model):
     last_practiced = models.DateTimeField(auto_now=True)
 
     class Meta:
-        indexes = [models.Index(fields=['user_profile', 'word']), ]
+        indexes = [models.Index(fields=['user_profile', 'wordItem']), ]
 
     def __str__(self):
         return f'{self.user_profile.user.username}: {self.wordItem}'
@@ -33,13 +33,13 @@ class UserWordDeposit(models.Model):
     )
 
     class Meta:
-        indexes = [models.Index(fields=['user_profile', 'word', 'weight', 'date_of_entry']), ]
-        constraints = (
+        indexes = [models.Index(fields=['user_profile', 'user_word', 'weight', 'date_of_entry']), ]
+        constraints = [
             CheckConstraint(
                 check=Q(weight__gte=0.0) & Q(weight__lte=1.0),
                 name='UserWordDeposit_weight_range'
             )
-        )
+        ]
 
 '''
 This model records which sentences a user is learning, their current proficiency level with each sentence, 

@@ -10,7 +10,7 @@ scores associated with different user_management.
 
 class WordScore(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    word = models.ForeignKey('learning.models.UserWordBank', on_delete=models.CASCADE)
+    word = models.ForeignKey('learning.UserWordBank', on_delete=models.CASCADE)
     score = models.FloatField()
     date = models.DateTimeField(auto_now=True)
 
