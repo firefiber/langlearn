@@ -1,15 +1,78 @@
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.core.validators import MaxValueValidator, MinValueValidator
 from user_management.models import UserProfile
 from languages.models import Language, Word, Sentence
 
+
+
+class UserWordDeck(models.Model):
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    words = models.TextField()
+    priority = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
+    )
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user_profile']),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(priority__gte=0.0) & models.Q(priority__lte=1.0),
+                name='UserWordDeck_priority_range'
+            )
+        ]
+
+class UserWordBuffer(models.Model):
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    word = GenericForeignKey('content_type', 'object_id')
+    date_created = models.DateTimeField(auto_now_add=True)
+    priority = models.DecimalField(max_digits=2, decimal_places=1, default=0.0)
+    custom = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.language_id:
+            active_language_proficiency = self.user_profile.get_active_language_proficiency()
+            if active_language_proficiency:
+                self.language_id = active_language_proficiency.language_id
+
+        if self.content_type.model_class().__name__ == 'UserWordDeck':
+            try:
+                custom_deck = self.content_type.get_object_for_this_type(pk=self.object_id)
+                self.priority = custom_deck.priority
+            except self.content_type.model_class().DoesNotExist:
+                self.priority = 0.0
+        else:
+            self.priority = 0.0
+        super().save(*args, **kwargs)
+
+        class Meta:
+            indexes = [
+                models.Index(fields=['user', 'content_type', 'object_id']),
+                models.Index(fields=['user', 'priority']),
+            ]
+            constraints = [
+                models.CheckConstraint(
+                    check=models.Q(priority__gte=0.0) & models.Q(priority__lte=1.0),
+                    name='UserPracticeBuffer_priority_range'
+                )
+            ]
+
+
+
+
 '''
 This model records which words a user is learning, their current proficiency level with each word, and the last 
 time they practiced that word. This is a many-to-many relationship between User and Word, as each user can learn many 
 words and each word can be learned by many user_management. 
 '''
-
 
 class UserWordBank(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
