@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'reporting.apps.ReportingConfig',
     'scoring.apps.ScoringConfig',
     'user_management.apps.UserManagementConfig',
+    'LangLearn',
 
     # THIRD PARTY APPS
     'rest_framework',

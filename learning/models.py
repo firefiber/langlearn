@@ -6,7 +6,12 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from user_management.models import UserProfile
 from languages.models import Language, Word, Sentence
 
+class FrequencyWordDeck(models.Model):
+    word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
+    frequency_rating = models.IntegerField()
 
+    def __str__(self):
+        return f'{self.word_item.word}: {self.frequency_rating}'
 
 class UserWordDeck(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
