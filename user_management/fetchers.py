@@ -1,6 +1,5 @@
 from django.core.cache import cache
 from user_management.models import UserProfile
-from learning.models import UserPracticeBuffer
 from languages.models import Word
 
 

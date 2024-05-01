@@ -27,5 +27,5 @@ class LearningViewResponseSerializer(serializers.Serializer):
 class UserWordSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserWordBank
-        fields = ['wordItem', 'proficiency_level', 'last_practiced']
+        fields = ['word_item', 'proficiency_level', 'last_practiced']
 

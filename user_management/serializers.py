@@ -45,10 +45,10 @@ class UserTrainingDataSerializer(serializers.ModelSerializer):
         # Fetch all UserWord instances for the user
         user_words = UserWordBank.objects.filter(user_profile=obj.user_profile)
         # Fetch all Word instances for the active language
-        words_in_language = Word.objects.filter(language=obj.language).values_list('word', flat=True)
+        words_in_language = Word.objects.filter(language=obj.language).values_list('word_item', flat=True)
 
         # Count how many user words are in the words of the active language
-        word_bank_count = sum(1 for user_word in user_words if user_word.wordItem in words_in_language)
+        word_bank_count = sum(1 for user_word in user_words if user_word.word_item in words_in_language)
 
         return word_bank_count
     def get_streak(self, obj):

@@ -1,7 +1,7 @@
 import textdistance
 from utils.languge_code_manager import LanguageCodeManager
 from django.utils import timezone
-from learning.models import Word, UserWordBank, Sentence, UserSentence, UserPracticeBuffer
+from learning.models import Word, UserWordBank, Sentence, UserSentence
 from scoring.models import WordScore
 from fuzzywuzzy import process
 from unidecode import unidecode
@@ -61,9 +61,9 @@ class ScoreManager:
         # extract word_scores from comparison_results
         word_scores = comparison_results['word_scores']
 
-        # update UserWord and WordScore models for each word and score
+        # update UserWord and WordScore models for each word_item and score
         for word, score in word_scores:
-            # Check if a UserWord record already exists for this user and word
+            # Check if a UserWord record already exists for this user and word_item
             user_word, created = UserWordBank.objects.get_or_create(
                 user_profile=self.user_profile,
                 word=word,
@@ -76,7 +76,7 @@ class ScoreManager:
                 user_word.last_practiced = timezone.now()
                 user_word.save()
 
-            # Create a new WordScore record with the score for this word
+            # Create a new WordScore record with the score for this word_item
             WordScore.objects.create(
                 user_profile=self.user_profile,
                 word=user_word,
@@ -93,15 +93,15 @@ class ScoreManager:
     #     correct_tokens = set(self.normalize_sentence(correct_sentence).split())
     #     user_tokens = set(self.normalize_sentence(user_sentence).split())
     #
-    #     user_tokens_corrected = set([self.get_best_match(word, correct_tokens) for word in user_tokens])
+    #     user_tokens_corrected = set([self.get_best_match(word_item, correct_tokens) for word_item in user_tokens])
     #
     #     common_tokens = correct_tokens.intersection(user_tokens_corrected)
     #
     #     print(common_tokens)
     #     word_scores = []
     #
-    #     for word in common_tokens:
-    #         word_scores.append((word, 1))
+    #     for word_item in common_tokens:
+    #         word_scores.append((word_item, 1))
     #
     #     # Calculate similarity ratio (number of common words divided by total number of user words)
     #     if len(user_tokens) == 0:

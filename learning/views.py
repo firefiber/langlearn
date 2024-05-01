@@ -120,7 +120,7 @@ class SessionView(APIView):
 
         if round_info:
             # Structure the response data
-            buffer_data = [{'word': item['word'], 'sentence': item['sentence'], 'translation': item['translation']}
+            buffer_data = [{'word_item': item['word_item'], 'sentence': item['sentence'], 'translation': item['translation']}
                            for item in round_info['buffer']]
             return Response(buffer_data)
         else:

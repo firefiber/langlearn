@@ -5,7 +5,7 @@ from .base import *
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'speasy_local',
+        'NAME': 'speezee_local_dev',
         'USER': 'admin',
         'HOST': 'localhost',
         'PORT': '5432',

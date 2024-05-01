@@ -22,22 +22,20 @@ class Language(models.Model):
 
 
 '''
-This model contains the data about each word that user_management can learn. Each word is associated with a language and has 
-a frequency_rating which indicates how common the word is. 
+This model contains the data about each word_item that user_management can learn. Each word_item is associated with a language and has 
+a frequency_rating which indicates how common the word_item is. 
 '''
 
 
 class Word(models.Model):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    word = models.CharField(max_length=100)
-    frequency_rating = models.IntegerField()
-    pos = models.CharField(max_length=2)
+    word_item = models.CharField(max_length=100)
 
     class Meta:
-        indexes = [models.Index(fields=['word', ]), ]
+        indexes = [models.Index(fields=['word_item', ]), ]
 
     def __str__(self):
-        return self.word
+        return self.word_item
 
 
 '''
@@ -132,13 +130,13 @@ class Translation(models.Model):
 
 '''
 This model records which words appear in which sentences. This is a many-to-many relationship 
-between Word and Sentence, as each sentence can contain many words and each word can appear in many sentences.
+between Word and Sentence, as each sentence can contain many words and each word_item can appear in many sentences.
 '''
 
 
 class WordInSentence(models.Model):
-    word = models.ForeignKey(Word, on_delete=models.CASCADE)
+    word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
     sentence = models.ForeignKey(Sentence, on_delete=models.CASCADE)
 
     class Meta:
-        indexes = [models.Index(fields=['word', 'sentence']), ]
+        indexes = [models.Index(fields=['word_item', 'sentence']), ]

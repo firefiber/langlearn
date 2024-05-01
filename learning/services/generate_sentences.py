@@ -24,7 +24,7 @@ def from_openai_chat(learning_language, native_language, proficiency, words, the
                            "Your primary function is to generate 2 sentences for each of the given words, in the learning language."
                            "Then, translate each sentence into the native language."
                            "Format the response this way: "
-                           "word | sentence | translation"
+                           "word_item | sentence | translation"
                            "One set per line. Do not include any additional formatting in your response."},
             {
                 "role": "user",
@@ -49,12 +49,12 @@ def clean_openai_output(output, learning_language, native_language):
     lines = output.split('\n')  # split the output into lines
     cleaned_output = []
     for line in lines:
-        # split each line into word, sentence, and translation
+        # split each line into word_item, sentence, and translation
         parts = line.split(" | ")
         if len(parts) == 3:  # check if line was split into 3 parts
             word, sentence, translation = parts
             cleaned_output.append({
-                "word": word.strip(),
+                "word_item": word.strip(),
                 "sentence": sentence.strip(),
                 "translation": translation.strip(),
             })
@@ -67,7 +67,7 @@ def from_openai_completion(learning_language, native_language, proficiency, word
         prompt=f"Create 2 {proficiency} level sentences in {learning_language} with each these words: {words}. "
                f"Then, translate these sentences into {native_language}. "
                "Format the response this way: "
-               "word | sentence | translation"
+               "word_item | sentence | translation"
                "One set per line. Do not include any additional formatting in your response.",
         temperature=0.1
 
