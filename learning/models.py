@@ -20,6 +20,9 @@ class FrequencyWordDeck(models.Model):
     def __str__(self):
         return f'{self.word_item.word_item}: {self.frequency_rating}'
 
+    class Meta:
+        ordering = ['frequency_rating']
+
 class UserWordDeck(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
@@ -58,35 +61,35 @@ class UserWordBuffer(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, editable=False)
     date_modified = models.DateTimeField(auto_now=True, editable=False)
 
-    def save(self, *args, **kwargs):
-        if self.pk is None:
-            if not self.language_id:
-                active_language_proficiency = self.user_profile.get_active_language_proficiency()
-                if active_language_proficiency:
-                    self.language_id = active_language_proficiency.language_id
-
-        try:
-            deck = self.content_type.get_object_for_this_type(pk=self.object_id)
-            if isinstance(deck, UserWordDeck):
-                self.priority = deck.priority_rating
-            elif isinstance(deck, FrequencyWordDeck):
-                    input_range = [FrequencyWordDeck.objects.first().frequency_rating, FrequencyWordDeck.objects.last().frequency_rating]
-                    output_range = [0.90, 0.01]
-                    self.priority = np.interp(deck.frequency_rating, input_range, output_range)
-            else:
-                raise ValueError(f"Unknown deck type: {type(deck)}")
-        except ObjectDoesNotExist:
-                raise ValueError("Deck does not exist")
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if self.pk is None:
+    #         if not self.language_id:
+    #             active_language_proficiency = self.user_profile.get_active_language_proficiency()
+    #             if active_language_proficiency:
+    #                 self.language_id = active_language_proficiency.language_id
+    #         try:
+    #             deck = self.content_type.get_object_for_this_type(pk=self.object_id)
+    #             if isinstance(deck, UserWordDeck):
+    #                 self.priority = deck.priority_rating
+    #             elif isinstance(deck, FrequencyWordDeck):
+    #                     input_range = [FrequencyWordDeck.objects.first().frequency_rating, FrequencyWordDeck.objects.last().frequency_rating]
+    #                     output_range = [0.90, 0.01]
+    #                     self.priority = np.interp(deck.frequency_rating, input_range, output_range)
+    #             else:
+    #                 raise ValueError(f"Unknown deck type: {type(deck)}")
+    #         except ObjectDoesNotExist:
+    #                 raise ValueError("Deck does not exist")
+    #         super().save(*args, **kwargs)
 
     class Meta:
+
         indexes = [
             models.Index(fields=['user_profile', 'content_type', 'object_id']),
             models.Index(fields=['user_profile', 'priority']),
         ]
         constraints = [
             models.CheckConstraint(
-                check=models.Q(priority__gte=0.00) & models.Q(priority__lte=1.00),
+                check=models.Q(priority__gte=0.00) & models.Q(priority__lte=0.5),
                 name='UserWordBuffer_priority_range'
             ),
             models.CheckConstraint(
