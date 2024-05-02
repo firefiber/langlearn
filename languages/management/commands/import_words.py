@@ -1,6 +1,7 @@
 import os
 from django.core.management.base import BaseCommand
 from languages.models import Word, Language
+from learning.models import FrequencyWordDeck
 import pandas as pd
 
 
@@ -13,18 +14,21 @@ class Command(BaseCommand):
 
         # Read the Excel file into a pandas DataFrame
         df = pd.read_excel(file_path)
-
+        df = df[::-1]
         # Get the language instance for the desired language (e.g., Spanish)
         language = Language.objects.get(name='Spanish')
 
         # Iterate over the DataFrame rows and create Word instances
         for _, row in df.iterrows():
-            word = Word(
+            word = Word.objects.create(
                 language=language,
-                word=row['lemma'],
-                frequency_rating=row['freq'],
-                pos=row['POS']
+                word_item=row['lemma'],
             )
-            word.save()
+
+            FrequencyWordDeck.objects.create(
+                language=language,
+                word_item=word,
+                frequency_rating=row['freq']
+            )
 
         self.stdout.write(self.style.SUCCESS('Words imported successfully.'))

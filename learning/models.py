@@ -82,7 +82,6 @@ class UserWordBuffer(models.Model):
     #         super().save(*args, **kwargs)
 
     class Meta:
-
         indexes = [
             models.Index(fields=['user_profile', 'content_type', 'object_id']),
             models.Index(fields=['user_profile', 'priority']),
