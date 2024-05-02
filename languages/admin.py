@@ -77,8 +77,9 @@ class SentenceAdmin(admin.ModelAdmin):
 
     type_display.short_description = 'Type'
 
-
+@admin.register(Word)
+class WordAdmin(admin.ModelAdmin):
+    list_display = ('id', 'language', 'word_item')
 
 admin.site.register(Language)
-admin.site.register(Word)
 admin.site.register(WordInSentence)
