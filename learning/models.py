@@ -4,6 +4,7 @@
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import UniqueConstraint
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import CheckConstraint, Q
@@ -12,13 +13,79 @@ from user_management.models import UserProfile
 from languages.models import Language, Word, Sentence
 import numpy as np
 
+class DeckVisibility(models.Model):
+    VISIBILITY_OPTIONS = [
+        ("private", "Private"),
+        ("public", "Public")
+    ]
+    value = models.CharField(choices=VISIBILITY_OPTIONS, unique=True)
+    description = models.TextField(max_length=200)
+
+class Deck(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(max_length=1000)
+    language = models.ForeignKey(Language, on_delete=models.CASCADE)
+    visibility = models.ForeignKey(DeckVisibility, on_delete=models.SET("public"))
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Name: {self.name}\nDescription: {self.description}'
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['name'])
+        ]
+
+class DeckItem(models.Model):
+    deck = models.ForeignKey(Deck, on_delete=models.CASCADE)
+    word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+        ordering = ['rank']
+
+class SystemDeck(DeckItem):
+    rank = models.IntegerField()
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['deck', 'word_item'], name='unique_systemdeck')
+        ]
+        indexes = [
+            models.Index(fields=['deck', 'rank', 'word_item'])
+        ]
+class UserDeck(DeckItem):
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    rank = models.DecimalField(
+        max_digits=2,
+        decimal_places=1,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
+    )
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['user_profile', 'deck'], name='unique_userdeck')
+        ]
+        indexes = [
+            models.Index(fields=['user_profile', 'deck', 'rank', 'word_item'])
+        ]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(rank__gte=0.0) & models.Q(rank__lte=1.0),
+                name='UserDeck_rank_range'
+            )
+        ]
+
+
 class FrequencyWordDeck(models.Model):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
     word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
     frequency_rating = models.IntegerField()
 
     def __str__(self):
-        return f'{self.word_item.word_item}: {self.frequency_rating}'
+        return f'{self.word_item}: {self.frequency_rating}'
 
     class Meta:
         ordering = ['frequency_rating']
@@ -49,9 +116,9 @@ class UserWordDeck(models.Model):
 class UserWordBuffer(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    deck_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    word_item = GenericForeignKey('content_type', 'object_id')
+    word_item = GenericForeignKey('deck_type', 'object_id')
     priority = models.DecimalField(max_digits=3, decimal_places=2)
     proficiency = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     fail_pass_ratio = models.DecimalField(max_digits=3, decimal_places=2, null=True)
@@ -68,7 +135,7 @@ class UserWordBuffer(models.Model):
     #             if active_language_proficiency:
     #                 self.language_id = active_language_proficiency.language_id
     #         try:
-    #             deck = self.content_type.get_object_for_this_type(pk=self.object_id)
+    #             deck = self.deck_type.get_object_for_this_type(pk=self.object_id)
     #             if isinstance(deck, UserWordDeck):
     #                 self.priority = deck.priority_rating
     #             elif isinstance(deck, FrequencyWordDeck):
@@ -83,14 +150,14 @@ class UserWordBuffer(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['user_profile', 'content_type', 'object_id']),
+            models.Index(fields=['user_profile', 'deck_type', 'object_id']),
             models.Index(fields=['user_profile', 'priority']),
         ]
         constraints = [
-            models.CheckConstraint(
-                check=models.Q(priority__gte=0.00) & models.Q(priority__lte=0.5),
-                name='UserWordBuffer_priority_range'
-            ),
+            # models.CheckConstraint(
+            #     check=models.Q(priority__gte=0.00) & models.Q(priority__lte=0.99),
+            #     value='UserWordBuffer_priority_range'
+            # ),
             models.CheckConstraint(
                 check=models.Q(proficiency__gte=0.00) & models.Q(proficiency__lte=1.00),
                 name='UserWordBuffer_proficiency_range'
@@ -99,9 +166,9 @@ class UserWordBuffer(models.Model):
 
 
 '''
-This model records which words a user is learning, their current proficiency level with each word_item, and the last 
-time they practiced that word_item. This is a many-to-many relationship between User and Word, as each user can learn many 
-words and each word_item can be learned by many user_management. 
+This model records which words a user is learning, their current proficiency level with each value, and the last 
+time they practiced that value. This is a many-to-many relationship between User and Word, as each user can learn many 
+words and each value can be learned by many user_management. 
 '''
 
 class UserWordBank(models.Model):

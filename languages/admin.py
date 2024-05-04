@@ -79,7 +79,7 @@ class SentenceAdmin(admin.ModelAdmin):
 
 @admin.register(Word)
 class WordAdmin(admin.ModelAdmin):
-    list_display = ('id', 'language', 'word_item')
+    list_display = ('id', 'language', 'value')
 
 admin.site.register(Language)
 admin.site.register(WordInSentence)

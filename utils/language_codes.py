@@ -1,12 +1,12 @@
 LANGUAGE_MAP = {
     "en": {
-        "name": "English",
+        "value": "English",
         "spacy": "en_core_web_md",
         "spellchecker": "en",
         "language_tool": "en-US",
     },
     "es": {
-        "name": "Spanish",
+        "value": "Spanish",
         "spacy": "es_core_news_sm",
         "spellchecker": "es",
         "language_tool": "es-ES",

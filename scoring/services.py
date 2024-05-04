@@ -61,9 +61,9 @@ class ScoreManager:
         # extract word_scores from comparison_results
         word_scores = comparison_results['word_scores']
 
-        # update UserWord and WordScore models for each word_item and score
+        # update UserWord and WordScore models for each value and score
         for word, score in word_scores:
-            # Check if a UserWord record already exists for this user and word_item
+            # Check if a UserWord record already exists for this user and value
             user_word, created = UserWordBank.objects.get_or_create(
                 user_profile=self.user_profile,
                 word=word,
@@ -76,7 +76,7 @@ class ScoreManager:
                 user_word.last_practiced = timezone.now()
                 user_word.save()
 
-            # Create a new WordScore record with the score for this word_item
+            # Create a new WordScore record with the score for this value
             WordScore.objects.create(
                 user_profile=self.user_profile,
                 word=user_word,
@@ -93,15 +93,15 @@ class ScoreManager:
     #     correct_tokens = set(self.normalize_sentence(correct_sentence).split())
     #     user_tokens = set(self.normalize_sentence(user_sentence).split())
     #
-    #     user_tokens_corrected = set([self.get_best_match(word_item, correct_tokens) for word_item in user_tokens])
+    #     user_tokens_corrected = set([self.get_best_match(value, correct_tokens) for value in user_tokens])
     #
     #     common_tokens = correct_tokens.intersection(user_tokens_corrected)
     #
     #     print(common_tokens)
     #     word_scores = []
     #
-    #     for word_item in common_tokens:
-    #         word_scores.append((word_item, 1))
+    #     for value in common_tokens:
+    #         word_scores.append((value, 1))
     #
     #     # Calculate similarity ratio (number of common words divided by total number of user words)
     #     if len(user_tokens) == 0:

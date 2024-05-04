@@ -3,8 +3,8 @@ from learning.models import UserWordBank
 from user_management.models import UserProfile
 
 '''
-This model records the score that each user has achieved for each word_item they've learned on each day. This is a 
-many-to-many relationship between User and Word, as each user can have many word_item scores and each word_item can have many 
+This model records the score that each user has achieved for each value they've learned on each day. This is a 
+many-to-many relationship between User and Word, as each user can have many value scores and each value can have many 
 scores associated with different user_management. 
 '''
 
@@ -19,7 +19,7 @@ class WordScore(models.Model):
         indexes = [models.Index(fields=['user_profile', 'word_item', 'date']), ]
 
     def __str__(self):
-        return f'{self.user_profile.user.username}: {self.word_item.word_item} - {self.score}'
+        return f'{self.user_profile.user.username}: {self.word_item} - {self.score}'
 
 
 '''

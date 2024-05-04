@@ -60,13 +60,13 @@ def fetch_words_in_buffer(user_profile):
 
 def fetch_user_words(user_profile):
     """
-    Fetch user-specific word_item data for a given user and language.
+    Fetch user-specific value data for a given user and language.
     """
-    # Fetch main buffer word_item list
+    # Fetch main buffer value list
     main_buffer = fetch_words_in_buffer(user_profile)
 
-    # Extract word_item list from main buffer
-    main_buffer_word_list = [word.word_item for word in main_buffer]
+    # Extract value list from main buffer
+    main_buffer_word_list = [word.value for word in main_buffer]
 
     # Fetch UserWords for the user and language
     user_words_queryset = UserWordBank.objects.filter(user_profile=user_profile)
@@ -85,12 +85,12 @@ def calculate_practice_buffer(main_buffer, user_words, buffer_size):
     Calculate practice buffer based on the user's main buffer, user words and other criteria.
     """
     # Create a list of user words for easy look-up
-    user_word_dict = {user_word.word_item: user_word for user_word in user_words}
+    user_word_dict = {user_word.value: user_word for user_word in user_words}
 
     # Calculate weights for all words in the buffer
     weights = []
     for word in main_buffer:
-        user_word = user_word_dict.get(word.word_item)
+        user_word = user_word_dict.get(word.value)
         # print(user_word.last_practiced, ", ", user_word.proficiency_level)
 
         if user_word:
@@ -108,7 +108,7 @@ def calculate_practice_buffer(main_buffer, user_words, buffer_size):
 
     # Use weighted random selection to choose words for the practice buffer
     practice_buffer = np.random.choice(main_buffer, size=buffer_size, replace=False, p=weights)
-    practice_buffer = [word.word_item for word in practice_buffer]
+    practice_buffer = [word.value for word in practice_buffer]
     # print(practice_buffer)
     return list(practice_buffer)
 

@@ -26,7 +26,7 @@ def store_sentence(sentence_text, language_name):
 
     Parameters:
     - sentence_text (str): The text of the sentence to be stored.
-    - language_name (str): The name of the language of the sentence.
+    - language_name (str): The value of the language of the sentence.
 
     Returns:
     - sentence (Sentence): The stored sentence instance.

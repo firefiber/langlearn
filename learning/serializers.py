@@ -5,7 +5,7 @@ from .models import UserWordBank
 class LanguageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Language
-        fields = ('name',)
+        fields = ('value',)
 
 class SentencePairSerializer(serializers.Serializer):
     word = serializers.CharField()

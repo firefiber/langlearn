@@ -8,6 +8,6 @@ urlpatterns = [
     path('compare/', CompareView.as_view(), name='compare'),
     path('userwords/', UserWordsView.as_view(), name='compare'),
     path('session/', SessionView.as_view(), name='session')
-    # path('next_sentence/', views.next_sentence, name='next_sentence'),
-    # path('compare/', views.compare, name='compare'),
+    # path('next_sentence/', views.next_sentence, value='next_sentence'),
+    # path('compare/', views.compare, value='compare'),
 ]

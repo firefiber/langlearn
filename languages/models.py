@@ -3,7 +3,7 @@ from statistics import mean
 from django.db import models
 
 '''
-This model contains data related to the languages that the app supports. Each language has a name. 
+This model contains data related to the languages that the app supports. Each language has a value. 
 This model is referenced by other models to link user_management, words, and sentences to a specific language. 
 '''
 
@@ -14,34 +14,34 @@ class Language(models.Model):
         ('N', 'Native'),
         ('B', 'Both')
     )
-    name = models.CharField(max_length=100)
+    value = models.CharField(max_length=100)
     category = models.CharField(max_length=1, choices=LANGUAGE_CATEGORIES, default='B')
 
     def __str__(self):
-        return self.name
+        return self.value
 
 
 '''
-This model contains the data about each word_item that user_management can learn. Each word_item is associated with a language and has 
-a frequency_rating which indicates how common the word_item is. 
+This model contains the data about each value that user_management can learn. Each value is associated with a language and has 
+a frequency_rating which indicates how common the value is. 
 '''
 
 
 class Word(models.Model):
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    word_item = models.CharField(max_length=100)
+    value = models.CharField(max_length=100)
 
     class Meta:
-        indexes = [models.Index(fields=['word_item', ]), ]
+        indexes = [models.Index(fields=['value', ]), ]
+        unique_together =['language', 'value']
 
     def __str__(self):
-        return self.word_item
+        return self.value
 
 
 '''
 This model stores sentence types.
 '''
-
 
 class SentenceType(models.Model):
     name = models.CharField(max_length=255)
@@ -130,7 +130,7 @@ class Translation(models.Model):
 
 '''
 This model records which words appear in which sentences. This is a many-to-many relationship 
-between Word and Sentence, as each sentence can contain many words and each word_item can appear in many sentences.
+between Word and Sentence, as each sentence can contain many words and each value can appear in many sentences.
 '''
 
 

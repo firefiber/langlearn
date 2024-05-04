@@ -27,8 +27,8 @@ class LearningView(APIView):
             # Prepare the data for the serializer
             data = {
                 'username': username,
-                'learning_language': {'name': round_info['user_info']['learning_language'].name},
-                'native_language': {'name': round_info['user_info']['native_language'].name},
+                'learning_language': {'value': round_info['user_info']['learning_language'].value},
+                'native_language': {'value': round_info['user_info']['native_language'].value},
                 'proficiency': round_info['user_info']['proficiency'],
                 'buffer': round_info['buffer'],  # The entire buffer
                 'learned_word_count': round_info['user_info']['learned_word_count'],
@@ -120,7 +120,7 @@ class SessionView(APIView):
 
         if round_info:
             # Structure the response data
-            buffer_data = [{'word_item': item['word_item'], 'sentence': item['sentence'], 'translation': item['translation']}
+            buffer_data = [{'value': item['value'], 'sentence': item['sentence'], 'translation': item['translation']}
                            for item in round_info['buffer']]
             return Response(buffer_data)
         else:
