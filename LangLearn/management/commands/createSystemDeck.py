@@ -2,7 +2,6 @@ import sys
 
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
-from django.apps import apps
 
 from languages.models import Language
 from learning.models import DeckVisibility, Deck
@@ -15,12 +14,12 @@ class Command(BaseCommand):
         parser.add_argument('language', type=str, help='Deck language')
         parser.add_argument('description', type=str, help='Deck description')
 
-
     def handle(self, *args, **options):
+        deck_name = options['name']
+        deck_desc = options['description']
+
         try:
-            deck_name = options['name']
             deck_lang = Language.objects.get(value=options['language'])
-            deck_desc = options['description']
             deck_visibility = DeckVisibility.objects.get(value='public')
 
             deck = Deck.objects.create(

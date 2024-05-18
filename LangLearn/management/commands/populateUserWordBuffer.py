@@ -4,43 +4,64 @@ from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
 from django.apps import apps
 
 from languages.models import Language
-from learning.models import FrequencyWordDeck, UserWordBuffer
+from learning.models import Deck, SystemDeck, UserWordBuffer
 
 import numpy as np
 
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('user', type=str, help="Username")
-        parser.add_argument('deck', type=str, help="Deck type")
+        parser.add_argument('username', type=str, help="Username")
+        parser.add_argument('deck_type', type=str, help="Input source deck type")
+        parser.add_argument('deck_name', type=str, help="Input source deck name")
 
     def handle(self, *args, **options):
+        username = options['username']
+        deck_type = options['deck_type']
+        deck_name = options['deck_name']
+
         try:
-        # Get the deck model
-            deck = apps.get_model('learning', options['deck'].lower())
+            # Get the deck wrapper
+            deck = Deck.objects.get(name=deck_name)
+            # Get the deck items
+            deck_items = getattr(deck, deck_type).all()[:100]
             # Get the user
-            user = User.objects.get(username=options['user'])
+            user = User.objects.get(username=username)
             # Get the userprofile
             user_profile = user.userprofile
             # Get the active learning language
             active_language = user_profile.get_active_language_proficiency().language
             # Get the active learning language id
             acitve_language_id = active_language.id
-            # Get deck type from deck model
-            deck_type = ContentType.objects.get_for_model(deck)
+            # Get content type
+            content_type = ContentType.objects.get_for_model(deck)
+            # Define input and output ranges for rank to priority mapping
+            input_range = [deck_items.first().rank, deck_items[len(deck_items) - 1].rank]
+            output_range = [0.9, 0.1]
 
-            # if deck_type == ""
-                # Get deck_items filtered by active language and buffer start and end frequency range (100)
-                    # For each deck item
-                        # Set priority to interpolation of item's frequency_rating from frequency range (1 to 100) to priority range (0.9 to 0.1)
-                        # Create new UserWordBuffer item
-                        # Set user_profile, language, deck_type
-                        # Set object id to current items id
-                        # Set priority
-                        # Validate and save entry
+            for item in deck_items:
+                value = item.rank
+                priority_mapped = np.interp(value, input_range, output_range)
+                priority_rounded = round(priority_mapped, 2)
+
+                user_buffer_item = UserWordBuffer.objects.create(
+                    user_profile=user_profile,
+                    language=active_language,
+                    deck_source=content_type,
+                    object_id=item.id,
+                    word_item=item.word_item,
+                    priority=priority_rounded
+                )
+
+        except ObjectDoesNotExist as e:
+            print("Model not found.")
+            sys.exit()
+
         except LookupError:
             print("Deck not found.")
             sys.exit()
