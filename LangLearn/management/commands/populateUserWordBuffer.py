@@ -1,23 +1,18 @@
 import sys
 
-from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404
-from django.apps import apps
 
-from languages.models import Language
-from learning.models import Deck, SystemDeck, UserWordBuffer
+from learning.models import Deck, SystemDeck, UserDeck, UserWordBuffer
 
 import numpy as np
-
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('username', type=str, help="Username")
-        parser.add_argument('deck_type', type=str, help="Input source deck type")
+        parser.add_argument('deck_type', type=str, help="Input source deck type (system_decks or user_decks)")
         parser.add_argument('deck_name', type=str, help="Input source deck name")
 
     def handle(self, *args, **options):
@@ -26,18 +21,21 @@ class Command(BaseCommand):
         deck_name = options['deck_name']
 
         try:
+            # Get the user
+            user = User.objects.get(username=username)
             # Get the deck wrapper
             deck = Deck.objects.get(name=deck_name)
             # Get the deck items
             deck_items = getattr(deck, deck_type).all()[:100]
-            # Get the user
-            user = User.objects.get(username=username)
             # Get the userprofile
             user_profile = user.userprofile
+            # Get the active learning language object
+            active_language_object = user_profile.get_active_language_proficiency()
+            # Exception if no active language found
+            if active_language_object is None:
+                raise AttributeError("User has not active language selected. Please set an active language and try again.")
             # Get the active learning language
-            active_language = user_profile.get_active_language_proficiency().language
-            # Get the active learning language id
-            acitve_language_id = active_language.id
+            active_language = active_language_object.language
             # Get content type
             content_type = ContentType.objects.get_for_model(deck)
             # Define input and output ranges for rank to priority mapping
@@ -57,6 +55,12 @@ class Command(BaseCommand):
                     word_item=item.word_item,
                     priority=priority_rounded
                 )
+
+        except User.DoesNotExist:
+            print(f"Username not found: {username}. Please try again.")
+
+        except Deck.DoesNotExist:
+            print("Deck not found. Please try again.")
 
         except ObjectDoesNotExist as e:
             print("Model not found.")

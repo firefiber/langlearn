@@ -25,7 +25,7 @@ class Deck(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=1000)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    visibility = models.ForeignKey(DeckVisibility, on_delete=models.SET("public"))
+    visibility = models.ForeignKey(DeckVisibility, on_delete=models.SET("private"))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -34,29 +34,27 @@ class Deck(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['name'])
+            models.Index(fields=['name', 'language'])
         ]
 
-class DeckItem(models.Model):
-    deck = models.ForeignKey(Deck, on_delete=models.CASCADE)
+class SystemDeck(models.Model):
+    deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name='system_decks')
     word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
-
-    class Meta:
-        abstract = True
-        ordering = ['rank']
-
-class SystemDeck(DeckItem):
     rank = models.IntegerField()
 
     class Meta:
+        ordering = ['rank']
         constraints = [
             UniqueConstraint(fields=['deck', 'word_item'], name='unique_systemdeck')
         ]
         indexes = [
-            models.Index(fields=['deck', 'rank', 'word_item'])
+            models.Index(fields=['deck','word_item', 'rank'])
         ]
-class UserDeck(DeckItem):
+
+class UserDeck(models.Model):
+    deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name='user_decks')
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
     rank = models.DecimalField(
         max_digits=2,
         decimal_places=1,
@@ -65,17 +63,16 @@ class UserDeck(DeckItem):
     active = models.BooleanField(default=True)
 
     class Meta:
-        constraints = [
-            UniqueConstraint(fields=['user_profile', 'deck'], name='unique_userdeck')
-        ]
-        indexes = [
-            models.Index(fields=['user_profile', 'deck', 'rank', 'word_item'])
-        ]
+        ordering = ['rank']
         constraints = [
             models.CheckConstraint(
                 check=models.Q(rank__gte=0.0) & models.Q(rank__lte=1.0),
                 name='UserDeck_rank_range'
-            )
+            ),
+            UniqueConstraint(fields=['deck', 'word_item'], name='unique_userdeck')
+        ]
+        indexes = [
+            models.Index(fields=['user_profile', 'rank', 'word_item'])
         ]
 
 
@@ -116,9 +113,9 @@ class UserWordDeck(models.Model):
 class UserWordBuffer(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    deck_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    deck_source = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    word_item = GenericForeignKey('deck_type', 'object_id')
+    word_item = GenericForeignKey('deck_source', 'object_id')
     priority = models.DecimalField(max_digits=3, decimal_places=2)
     proficiency = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     fail_pass_ratio = models.DecimalField(max_digits=3, decimal_places=2, null=True)
@@ -148,9 +145,12 @@ class UserWordBuffer(models.Model):
     #                 raise ValueError("Deck does not exist")
     #         super().save(*args, **kwargs)
 
+    def get_deck_name(self):
+        return self.word_item.deck.name
+
     class Meta:
         indexes = [
-            models.Index(fields=['user_profile', 'deck_type', 'object_id']),
+            models.Index(fields=['user_profile', 'deck_source', 'object_id']),
             models.Index(fields=['user_profile', 'priority']),
         ]
         constraints = [
