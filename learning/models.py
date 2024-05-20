@@ -75,41 +75,6 @@ class UserDeck(models.Model):
             models.Index(fields=['user_profile', 'rank', 'word_item'])
         ]
 
-
-class FrequencyWordDeck(models.Model):
-    language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
-    frequency_rating = models.IntegerField()
-
-    def __str__(self):
-        return f'{self.word_item}: {self.frequency_rating}'
-
-    class Meta:
-        ordering = ['frequency_rating']
-
-class UserWordDeck(models.Model):
-    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
-    priority_rating = models.DecimalField(
-        max_digits=2,
-        decimal_places=1,
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
-    )
-    date_created = models.DateTimeField(auto_now_add=True)
-    active = models.BooleanField(default=True)
-
-    class Meta:
-        indexes = [
-            models.Index(fields=['user_profile']),
-        ]
-        constraints = [
-            models.CheckConstraint(
-                check=models.Q(priority_rating__gte=0.0) & models.Q(priority_rating__lte=1.0),
-                name='UserWordDeck_priority_rating_range'
-            )
-        ]
-
 class UserWordBuffer(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
@@ -154,10 +119,6 @@ class UserWordBuffer(models.Model):
             models.Index(fields=['user_profile', 'priority']),
         ]
         constraints = [
-            # models.CheckConstraint(
-            #     check=models.Q(priority__gte=0.00) & models.Q(priority__lte=0.99),
-            #     value='UserWordBuffer_priority_range'
-            # ),
             models.CheckConstraint(
                 check=models.Q(proficiency__gte=0.00) & models.Q(proficiency__lte=1.00),
                 name='UserWordBuffer_proficiency_range'
@@ -210,3 +171,36 @@ This model stores the buffer of sentences that a user is currently practicing. I
 The buffer is stored as a JSONField for easy access and quick retrieval.
 '''
 
+# class FrequencyWordDeck(models.Model):
+#     language = models.ForeignKey(Language, on_delete=models.CASCADE)
+#     word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
+#     frequency_rating = models.IntegerField()
+#
+#     def __str__(self):
+#         return f'{self.word_item}: {self.frequency_rating}'
+#
+#     class Meta:
+#         ordering = ['frequency_rating']
+
+# class UserWordDeck(models.Model):
+#     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+#     language = models.ForeignKey(Language, on_delete=models.CASCADE)
+#     word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
+#     priority_rating = models.DecimalField(
+#         max_digits=2,
+#         decimal_places=1,
+#         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
+#     )
+#     date_created = models.DateTimeField(auto_now_add=True)
+#     active = models.BooleanField(default=True)
+#
+#     class Meta:
+#         indexes = [
+#             models.Index(fields=['user_profile']),
+#         ]
+#         constraints = [
+#             models.CheckConstraint(
+#                 check=models.Q(priority_rating__gte=0.0) & models.Q(priority_rating__lte=1.0),
+#                 name='UserWordDeck_priority_rating_range'
+#             )
+#         ]

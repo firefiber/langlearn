@@ -34,7 +34,6 @@ class UserDeckEntryForm(forms.ModelForm):
 
         return cleaned_data
 
-
     class Meta:
         model = UserDeck
         fields = ['user_profile', 'deck', 'rank']

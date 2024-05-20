@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
 
-from learning.models import Deck, DeckVisibility, UserDeck, UserWordBuffer
+from learning.models import Deck, DeckVisibility, UserDeck
 from languages.models import Language
 from user_management.models import User
 

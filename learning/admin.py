@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.admin import GenericTabularInline
 
 from languages.models import Word
-from .models import Deck, UserDeck, SystemDeck, UserWordBank, UserSentence, UserWordDeck, UserWordBuffer, FrequencyWordDeck
+from .models import Deck, UserDeck, SystemDeck, UserWordBank, UserSentence, UserWordBuffer
 
 from .forms import UserDeckEntryForm
 

@@ -44,7 +44,7 @@ def fetch_words_in_buffer(user_profile):
     active_proficiency = user_profile.get_active_language_proficiency()
 
     # Create a unique cache key based on the language and buffer range
-    cache_key = f'{active_proficiency.language.id}_{active_proficiency.buffer_range_start}_{active_proficiency.buffer_range_end}'
+    cache_key = f'{user_profile}_{active_proficiency.language.id}_{active_proficiency.buffer_range_start}_{active_proficiency.buffer_range_end}'
     words_in_buffer = cache.get(cache_key)
 
     # If the words aren't in the cache, fetch them from the database and store them in the cache

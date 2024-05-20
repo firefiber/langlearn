@@ -1,8 +1,10 @@
 import os, sys
+
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
+
 from languages.models import Word, Language
-from learning.models import FrequencyWordDeck
+
 import pandas as pd
 
 
