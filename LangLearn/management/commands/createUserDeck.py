@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
 
-from learning.models import Deck, DeckVisibility, UserDeck
+from learning.models import Deck
 from languages.models import Language
 from user_management.models import User
 
@@ -17,7 +17,7 @@ class Command(BaseCommand):
         username = options['username']
         deck_name = options['deck_name']
         deck_desc = options['deck_desc']
-        deck_visibility = DeckVisibility.objects.get(value='private')
+        deck_visibility = 0
 
         try:
             user = User.objects.get(username=username)

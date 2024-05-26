@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 
 from user_management.models import User
 from languages.models import Word, Language
-from learning.models import Deck, UserDeck
+from learning.models import Deck
 
 
 class Command(BaseCommand):

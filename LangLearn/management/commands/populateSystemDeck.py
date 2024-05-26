@@ -6,7 +6,7 @@ from django.conf import settings
 from django.apps import apps
 
 from languages.models import Language, Word
-from learning.models import DeckVisibility, Deck, SystemDeck
+from learning.models import Deck
 
 import pandas as pd
 

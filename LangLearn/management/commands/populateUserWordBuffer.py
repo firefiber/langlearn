@@ -4,83 +4,79 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 
-from learning.models import Deck, SystemDeck, UserDeck, UserWordBuffer
+from user_management.models import UserProfile, UserLearningLanguage
+from learning.models import Deck, DeckWord, UserWordBuffer
 
 import numpy as np
+
+class UserNotActiveError(Exception):
+    """Exception raised when a user account is not marked active."""
+    pass
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('username', type=str, help="Username")
-        parser.add_argument('deck_type', type=str, help="Input source deck type (system_decks or user_decks)")
-        parser.add_argument('deck_name', type=str, help="Input source deck name")
 
     def handle(self, *args, **options):
         username = options['username']
-        deck_type = options['deck_type']
-        deck_name = options['deck_name']
 
         try:
-            # Get the user
+            # Get user and user profile
             user = User.objects.get(username=username)
-            # Get the deck wrapper
-            deck = Deck.objects.get(name=deck_name)
-            # Get the deck items
-            deck_items = getattr(deck, deck_type).all()[:100]
-            # Get the userprofile
+            # If user account inactive, raise error
+            if not user.is_active:
+                raise UserNotActiveError
+
             user_profile = user.userprofile
-            # Get the active learning language object
-            active_language_object = user_profile.get_active_language_proficiency()
-            # Exception if no active language found
-            if active_language_object is None:
-                raise AttributeError("User has not active language selected. Please set an active language and try again.")
-            # Get the active learning language
+            # Get active language data
+            active_language_object = user_profile.get_active_language()
             active_language = active_language_object.language
-            # Get content type
-            content_type = ContentType.objects.get_for_model(deck)
-            # Define input and output ranges for rank to priority mapping
-            input_range = [deck_items.first().rank, deck_items[len(deck_items) - 1].rank]
-            output_range = [0.9, 0.1]
+            # Get active deck data
+            deck = user_profile.get_active_deck(active_language)
+            deck_words = DeckWord.objects.filter(deck=deck)[:10]
+            # Create priority calculation function based on rank type
+            if deck.rank_type == Deck.INTEGER:
+                # If rank type is integer, interpolate from rank scale (1 - n) to priority scale (1.00 - 0.01)
+                interp_input_range = [deck_words[0].rank, deck_words[len(deck_words) - 1].rank]
+                interp_output_range = [1.00, 0.01]
+                def calculate_priority(rank):
+                    return np.round(np.interp(rank, interp_input_range, interp_output_range), 2)
+            elif deck.rank_type == Deck.FLOAT:
+                # If rank type is float (1.00 - 0.01), return rank as is.
+                def calculate_priority(rank):
+                    return rank
+            # Loop over words in deck word items
+            with transaction.atomic():
+                for deck_word in deck_words:
+                    # For each word, calculate priority, set the word item, and create buffer entry
+                    priority = calculate_priority(deck_word.rank)
+                    word_item = deck_word.word_item
+                    user_word_buffer = UserWordBuffer.objects.create(
+                        user_profile=user_profile,
+                        language=active_language,
+                        deck_source=deck,
+                        word_item=word_item,
+                        priority=priority
+                    )
 
-            for item in deck_items:
-                value = item.rank
-                priority_mapped = np.interp(value, input_range, output_range)
-                priority_rounded = round(priority_mapped, 2)
-
-                user_buffer_item = UserWordBuffer.objects.create(
-                    user_profile=user_profile,
-                    language=active_language,
-                    deck_source=content_type,
-                    object_id=item.id,
-                    word_item=item.word_item,
-                    priority=priority_rounded
-                )
+            self.stdout.write(self.style.SUCCESS(f'User word buffer successfully populated for "{username}", with words from deck "{deck.name}".'))
 
         except User.DoesNotExist:
-            print(f"Username not found: {username}. Please try again.")
+            self.stderr.write(f'No user account found for "{username}". Please verify the user account exists.')
+
+        except UserNotActiveError:
+            self.stderr.write(f'User account for "{username}" not active. Please activate user account and try again.')
+
+        except UserProfile.DoesNotExist:
+            self.stderr.write(f'No user profile found for "{username}". Please verify the user has a user profile created.')
+
+        except UserLearningLanguage.DoesNotExist:
+            self.stderr.write(f'User "{username}" has no active language set.')
 
         except Deck.DoesNotExist:
-            print("Deck not found. Please try again.")
-
-        except ObjectDoesNotExist as e:
-            print("Model not found.")
-            sys.exit()
-
-        except LookupError:
-            print("Deck not found.")
-            sys.exit()
-
-
-
-
-
-
-
-
-
-
-
-
+            self.stderr.write(f'No active decks found. Please activate a deck for user "{username}" and try again.')
 
 
 
