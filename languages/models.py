@@ -1,12 +1,14 @@
-import hashlib
-from statistics import mean
 from django.db import models
+
+from statistics import mean
+import hashlib, langcodes
 
 '''
 This model contains data related to the languages that the app supports. Each language has a value. 
 This model is referenced by other models to link user_management, words, and sentences to a specific language. 
 '''
 
+#TODO: Get language code in custom save, and not on creation.
 
 class Language(models.Model):
     LANGUAGE_CATEGORIES = (
@@ -15,10 +17,12 @@ class Language(models.Model):
         ('B', 'Both')
     )
     value = models.CharField(max_length=100)
-    category = models.CharField(max_length=1, choices=LANGUAGE_CATEGORIES, default='B')
+    code = models.CharField(max_length=3)
+    category = models.CharField(max_length=1, choices=LANGUAGE_CATEGORIES)
 
     def __str__(self):
         return self.value
+
 
 
 '''
@@ -32,8 +36,8 @@ class Word(models.Model):
     value = models.CharField(max_length=100)
 
     class Meta:
-        indexes = [models.Index(fields=['value', ]), ]
-        unique_together =['language', 'value']
+        indexes = [models.Index(fields=['language', 'value']), ]
+        unique_together = ['language', 'value']
 
     def __str__(self):
         return self.value

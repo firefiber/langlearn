@@ -8,35 +8,35 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 
-from .models import UserDeck, Deck
+from .models import Deck
 from user_management.models import UserProfile
 from languages.models import Word
 
 
-class UserDeckEntryForm(forms.ModelForm):
-    word_list_raw = forms.CharField(label='Word list (comma separated)', widget=forms.Textarea(attrs={'rows':5}))
-    rank = forms.DecimalField(label='Rank', min_value=0.0, max_value=1.0)
-
-    # Clean word list and enter items into array split at comma
-    def clean_word_list(self):
-        word_list = self.cleaned_data['word_list_raw']
-        word_list = [word.strip() for word in word_list.split(',') if word.strip()]
-        return word_list
-
-    def clean(self):
-        cleaned_data = super().clean()
-        user_profile = cleaned_data.get('user_profile')
-        deck = cleaned_data.get('deck')
-
-        if user_profile and deck:
-            if not UserDeck.objects.filter(deck=deck, user_profile=user_profile):
-                raise forms.ValidationError(f'User {user_profile} does not have edit permissions for this deck.')
-
-        return cleaned_data
-
-    class Meta:
-        model = UserDeck
-        fields = ['user_profile', 'deck', 'rank']
+# class UserDeckEntryForm(forms.ModelForm):
+#     word_list_raw = forms.CharField(label='Word list (comma separated)', widget=forms.Textarea(attrs={'rows':5}))
+#     rank = forms.DecimalField(label='Rank', min_value=0.0, max_value=1.0)
+#
+#     # Clean word list and enter items into array split at comma
+#     def clean_word_list(self):
+#         word_list = self.cleaned_data['word_list_raw']
+#         word_list = [word.strip() for word in word_list.split(',') if word.strip()]
+#         return word_list
+#
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         user_profile = cleaned_data.get('user_profile')
+#         deck = cleaned_data.get('deck')
+#
+#         if user_profile and deck:
+#             if not UserDeck.objects.filter(deck=deck, user_profile=user_profile):
+#                 raise forms.ValidationError(f'User {user_profile} does not have edit permissions for this deck.')
+#
+#         return cleaned_data
+#
+#     class Meta:
+#         model = Deck
+#         fields = ['user_profile', 'deck', 'rank']
     # For each word:
         # If word exists in main db:
             # Enter new deck entry
