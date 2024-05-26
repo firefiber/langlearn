@@ -1,7 +1,7 @@
 import textdistance
 from utils.languge_code_manager import LanguageCodeManager
 from django.utils import timezone
-from learning.models import Word, UserWordBank, Sentence, UserSentence
+from learning.models import Word, UserWordBank, Sentence
 from scoring.models import WordScore
 from fuzzywuzzy import process
 from unidecode import unidecode
