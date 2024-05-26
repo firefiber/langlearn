@@ -1,7 +1,7 @@
 #TODO: Rework entire flow - lots of redundancy here.
 
 from django.core.cache import cache
-from user_management.models import UserProfile, UserLanguageProficiency
+from user_management.models import UserProfile, UserLearningLanguage
 from learning.models import UserWordBank
 from languages.models import Word
 import numpy as np

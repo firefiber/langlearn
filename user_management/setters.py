@@ -1,4 +1,4 @@
-from user_management.models import UserLanguageProficiency
+from user_management.models import UserLearningLanguage
 from languages.models import Word
 
 

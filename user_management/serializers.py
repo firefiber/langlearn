@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 
 from learning.models import UserWordBank
-from .models import UserProfile, UserLanguageProficiency
+from .models import UserProfile, UserLearningLanguage
 from languages.models import Language, Word
 from datetime import datetime, timedelta
 
@@ -11,7 +11,7 @@ class LearningLanguageSerializer(serializers.ModelSerializer):
     language_name = serializers.CharField(source='language.value')
 
     class Meta:
-        model = UserLanguageProficiency
+        model = UserLearningLanguage
         fields = ['language_name', 'is_active']
 
 class UserDetailSerializer(serializers.ModelSerializer):
@@ -38,7 +38,7 @@ class UserTrainingDataSerializer(serializers.ModelSerializer):
     streak = serializers.SerializerMethodField()
 
     class Meta:
-        model = UserLanguageProficiency
+        model = UserLearningLanguage
         fields = ['proficiency', 'word_bank_count', 'streak']
 
     def get_word_bank_count(self, obj):
@@ -100,7 +100,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
 
         if learning_language_id:
-            UserLanguageProficiency.objects.create(
+            UserLearningLanguage.objects.create(
                 user_profile=user_profile,
                 language=learning_language_id,
                 is_active=True
