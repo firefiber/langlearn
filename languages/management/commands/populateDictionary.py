@@ -17,7 +17,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             # Get the path to the Excel file relative to the current script
-            file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'frequency_table_cleaned.xlsx')
+            file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data',
+                                     'SpanishFrequencyDeck.xlsx')
 
             if not os.path.exists(file_path):
                 raise FileNotFoundError("File not found.")
