@@ -2,18 +2,10 @@
 #TODO: Auto update proficiency?
 #TODO: Test with selecting algo
 
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from django.db.models import UniqueConstraint
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
-from django.db.models import CheckConstraint, Q
-from django.core.validators import MaxValueValidator, MinValueValidator
 from user_management.models import UserProfile
 from languages.models import Language, Word, Sentence
 import numpy as np
-
-##################### NEW MODELS TESTING #####################
 
 # Base abstract model for all common deck information
 # (name, language, visibility, etc).
@@ -35,7 +27,7 @@ class Deck(models.Model):
     description = models.TextField(max_length=500)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
     word_items = models.ManyToManyField(Word, through='learning.DeckWord')
-    rank_type = models.CharField(choices=RANK_TYPES, default=FLOAT)
+    is_ranked = models.BooleanField(default=True)
     visibility = models.PositiveIntegerField(choices=VISIBILITY_OPTIONS, default=0)
     created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=False)
     created = models.DateTimeField(auto_now_add=True)
@@ -46,7 +38,7 @@ class Deck(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk:
             if not self.created_by and not self.visibility:
-                self.visibility = 0
+                self.visibility = 1
         super().save(*args, **kwargs)
 
     class Meta:
@@ -59,24 +51,14 @@ class Deck(models.Model):
 class DeckWord(models.Model):
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE)
     word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
-    rank = models.DecimalField(max_digits=7, decimal_places=2)
-
-    def clean(self):
-        super().clean()
-        if self.deck.rank_type == self.deck.INTEGER:
-            if self.rank % 1 != 0 or self.rank < 0:
-                raise ValidationError(f'Rank must be a non-negative integer when rank type is set to {self.rank_type}')
-        elif self.deck.rank_type == self.deck.FLOAT:
-            if not (0 <= self.rank <= 1):
-                raise ValidationError(f'Rank must be between 0.0 and 1.0 when rank type is set to {self.rank_type}')
+    rank = models.PositiveIntegerField()
 
     def __str__(self):
         return f'Deck: {self.deck.name}\nWord: {self.word_item.value}\nRank: {self.rank}'
 
-    # class Meta:
-    #     indexes = [
-    #         models.Index(fields=['deck', 'word_item'])
-    #         ]
+    class Meta:
+        unique_together = ['deck', 'word_item']
+
 
 # Model to keep track of all decks users have
 # subscribed to and active status
@@ -97,64 +79,6 @@ class UserDeckSubscription(models.Model):
 
     class Meta:
         unique_together = ('user_profile', 'deck')
-
-##############################################################
-
-# class Deck(models.Model):
-#     name = models.CharField(max_length=100)
-#     description = models.TextField(max_length=1000)
-#     language = models.ForeignKey(Language, on_delete=models.CASCADE)
-#     visibility = models.PositiveIntegerField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#
-#     def __str__(self):
-#         return f'Name: {self.name}\nDescription: {self.description}'
-#
-#     class Meta:
-#         indexes = [
-#             models.Index(fields=['name', 'language'])
-#         ]
-
-# class SystemDeck(models.Model):
-#     deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name='system_decks')
-#     word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
-#     rank = models.IntegerField()
-#
-#     class Meta:
-#         ordering = ['rank']
-#         constraints = [
-#             UniqueConstraint(fields=['deck', 'word_item'], name='unique_systemdeck')
-#         ]
-#         indexes = [
-#             models.Index(fields=['deck','word_item', 'rank'])
-#         ]
-#
-# class UserDeck(models.Model):
-#     deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name='user_decks')
-#     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-#     word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
-#     rank = models.DecimalField(
-#         max_digits=2,
-#         decimal_places=1,
-#         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
-#     )
-#     active = models.BooleanField(default=True)
-#
-#     class Meta:
-#         ordering = ['rank']
-#         constraints = [
-#             models.CheckConstraint(
-#                 check=models.Q(rank__gte=0.0) & models.Q(rank__lte=1.0),
-#                 name='UserDeck_rank_range'
-#             ),
-#             UniqueConstraint(fields=['deck', 'word_item'], name='unique_userdeck')
-#         ]
-#         indexes = [
-#             models.Index(fields=['user_profile', 'rank', 'word_item'])
-#         ]
-
-
 
 # user buffer has fixed input slice size (from any given deck, only a max amount of words will be added at once to the buffer)
 # buffer assigns input priority of each word:
