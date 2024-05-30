@@ -35,7 +35,9 @@ class Deck(models.Model):
 
     def __str__(self):
         return self.name
+
     def save(self, *args, **kwargs):
+
         if not self.pk:
             if not self.created_by and not self.visibility:
                 self.visibility = 1
@@ -58,6 +60,7 @@ class DeckWord(models.Model):
 
     class Meta:
         unique_together = ['deck', 'word_item']
+        ordering = ['rank']
 
 
 # Model to keep track of all decks users have
@@ -65,6 +68,7 @@ class DeckWord(models.Model):
 class UserDeckSubscription(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE)
+    # language = models.ForeignKey(Language, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -78,6 +82,9 @@ class UserDeckSubscription(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
+        indexes = [
+            models.Index(fields=['user_profile', 'deck'])
+        ]
         unique_together = ('user_profile', 'deck')
 
 # user buffer has fixed input slice size (from any given deck, only a max amount of words will be added at once to the buffer)
@@ -101,35 +108,86 @@ class UserDeckSubscription(models.Model):
 # 			- from deck source, get next section (from current + 1 to max size)
 
 class UserWordBuffer(models.Model):
+    BUFFER_SIZE = 100
+
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    language = models.ForeignKey(Language, on_delete=models.CASCADE)
-    deck_source = models.ForeignKey(Deck, on_delete=models.SET_NULL, null=True)
+    deck = models.ForeignKey(Deck, on_delete=models.SET_NULL, null=True)
+    deck_length = models.PositiveIntegerField(default=0)
+    word_items = models.ManyToManyField(Word, through='learning.UserDeckBufferWord')
+    is_fully_loaded = models.BooleanField(default=False)
+
+    def refill_buffer(self):
+        if self.is_fully_loaded:
+            return
+
+        def get_next_slice():
+            deck_length = self.deck_length
+
+            deck_slice_start = self.word_items.count()
+            deck_slice_end = deck_slice_start + min(self.BUFFER_SIZE, self.deck_length - deck_slice_start)
+
+            next_deck_slice = list(DeckWord.objects.filter(
+                deck=self.deck)[deck_slice_start: deck_slice_end])
+
+            return next_deck_slice
+
+        next_slice = get_next_slice()
+
+        def calculate_priority(word_rank):
+            input_range = [next_slice[0].rank, next_slice[-1].rank]
+            output_range = [1.00, 0.10]
+
+            init_priority = np.round(np.interp(word_rank, input_range, output_range),2)
+
+            return init_priority
+
+
+        for deck_item in next_slice:
+            word_item = deck_item.word_item
+            rank = deck_item.rank
+
+            priority = calculate_priority(rank)
+
+            print(word_item,rank, priority)
+            buffer_word_item = UserDeckBufferWord.objects.create(
+                buffer=self,
+                word_item=word_item,
+                priority=priority,
+                proficiency=0
+            )
+
+        buffer_size = min(UserWordBuffer.BUFFER_SIZE, self.deck_length)
+        self.is_fully_loaded = True if buffer_size == self.deck_length else False
+
+    def __str__(self):
+        return self.deck.name
+    class Meta:
+        indexes = [
+            models.Index(fields=['user_profile', 'deck']),
+        ]
+
+class UserDeckBufferWord(models.Model):
+    buffer = models.ForeignKey(UserWordBuffer, on_delete=models.CASCADE, null=True)
     word_item = models.ForeignKey(Word, on_delete=models.CASCADE)
     priority = models.DecimalField(max_digits=3, decimal_places=2)
     proficiency = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
-    fail_pass_ratio = models.DecimalField(max_digits=3, decimal_places=2, null=True)
+    fail_pass_ratio = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     times_seen = models.IntegerField(default=0)
     times_passed = models.IntegerField(default=0)
     times_failed = models.IntegerField(default=0)
     date_created = models.DateTimeField(auto_now_add=True, editable=False)
     date_modified = models.DateTimeField(auto_now=True, editable=False)
 
-    def save(self, *args, **kwargs):
-        # If number of entries
-        print(UserWordBuffer.objects.count())
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return self.buffer.deck.name
+
     class Meta:
-        indexes = [
-            models.Index(fields=['user_profile', 'deck_source']),
-            models.Index(fields=['user_profile', 'priority']),
-        ]
         constraints = [
             models.CheckConstraint(
                 check=models.Q(proficiency__gte=0.00) & models.Q(proficiency__lte=1.00),
                 name='UserWordBuffer_proficiency_range'
             )
         ]
-
 
 '''
 This model records which words a user is learning, their current proficiency level with each value, and the last 
